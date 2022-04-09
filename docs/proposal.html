@@ -1,0 +1,466 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+
+<head>
+    <title>Weaponized Roman Candles | CS 184</title>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" type="text/css" href="style.css" media="screen" />
+    <script type="text/javascript"
+        src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+</head>
+
+<body>
+    <div class="site-header">
+        <div class="row">
+            <div class="name-header">
+                <p>Weaponized Roman Candles - CS184</p>
+            </div>
+            <div class="title-bar">
+                <ul>
+                    <li>
+                        <a href="proposal.html">Proposal</a>
+                    </li>
+                    <li>
+                        <a href="milestone.html">Milestone</a>
+                    </li>
+                    <li>
+                        <a href="report.html">Final Report</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <br />
+    <div class="report-body">
+        <h1 align="middle">Final Project Proposal</h1>
+        <h3 align="middle">Daniel He, Nicholas Jennings, Anthony Villegas, Albert Wen</h3>
+        <h2>Title, Summary and Team Members</h2>
+        <p>
+            <b>Name:</b> “Weaponized Roman Candles”
+        </p>
+        <p>
+            <b>Summary:</b> We’ll create a VR game in unity (with a heavy emphasis on custom compute and fragment
+            shaders) in which you can shoot physically accurate fireworks from your hands.
+        </p>
+        <p>
+            <b>Team Members:</b> Anthony Villegas, Daniel He, Nicholas Jennings, Albert Wen (all from cs184)
+        </p>
+        <h2>Problem Description</h2>
+        <h3> Particle Dynamics </h3>
+        <p>
+            In order to solve the differential equations related to the translational motion of firework ejecta, we will
+            utilize explicit Euler integration and the simplest possible model of an explosion.
+            For this model, we make the following assumptions:
+        <ul>
+            <li>
+                <a>Ejecta can be idealized as point masses such that rotational motion is ignored</a>
+            </li>
+            <li>
+                <a>There are no collisions between ejecta</a>
+            </li>
+            <li>
+                <a>All ejecta receive the same initial speed</a>
+            </li>
+            <li>
+                <a>All ejecta are the same size</a>
+            </li>
+            <li>
+                <a>We will use a fixed Cartesian basis coordinate system</a>
+            </li>
+        </ul>
+        </p>
+
+        <p>
+            Our governing equation for a single particle is based on Newton’s second law of motion:
+        </p>
+        <p style="text-align:center">
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <mstyle displaystyle="true">
+                    <mrow class="MJX-TeXAtom-ORD">
+                        <msubsup>
+                            <mi mathvariant="normal">&#x03A8;
+                                <!-- Ψ -->
+                            </mi>
+                            <mrow class="MJX-TeXAtom-ORD">
+                                <mi>i</mi>
+                            </mrow>
+                            <mrow class="MJX-TeXAtom-ORD">
+                                <mi>t</mi>
+                                <mi>o</mi>
+                                <mi>t</mi>
+                            </mrow>
+                        </msubsup>
+                        <mo>=</mo>
+                        <msub>
+                            <mi>F</mi>
+                            <mrow class="MJX-TeXAtom-ORD">
+                                <mi>d</mi>
+                                <mo>,</mo>
+                                <mi>i</mi>
+                            </mrow>
+                        </msub>
+                        <mo>+</mo>
+                        <msub>
+                            <mi>F</mi>
+                            <mrow class="MJX-TeXAtom-ORD">
+                                <mi>g</mi>
+                                <mo>,</mo>
+                                <mi>i</mi>
+                            </mrow>
+                        </msub>
+                    </mrow>
+                </mstyle>
+            </math>
+        </p>
+
+        <p>
+            Where
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <mstyle displaystyle="true">
+                    <mrow class="MJX-TeXAtom-ORD">
+                        <msub>
+                            <mi>F</mi>
+                            <mrow class="MJX-TeXAtom-ORD">
+                                <mi>d</mi>
+                                <mo>,</mo>
+                                <mi>i</mi>
+                            </mrow>
+                        </msub>
+                    </mrow>
+                </mstyle>
+            </math>
+            is drag force and
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <mstyle displaystyle="true">
+                    <mrow class="MJX-TeXAtom-ORD">
+                        <msub>
+                            <mi>F</mi>
+                            <mrow class="MJX-TeXAtom-ORD">
+                                <mi>g</mi>
+                                <mo>,</mo>
+                                <mi>i</mi>
+                            </mrow>
+                        </msub>
+                    </mrow>
+                </mstyle>
+            </math>
+            is gravity force.
+        </p>
+
+        <p>
+            As such, the time stepping to alter the particle’s position and velocity will be:
+        </p>
+
+        </p>
+        <p style="text-align:center">
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <mstyle displaystyle="true">
+                    <mrow class="MJX-TeXAtom-ORD">
+                        <mi>v</mi>
+                        <mo stretchy="false">(</mo>
+                        <mi>t</mi>
+                        <mo>+</mo>
+                        <mi mathvariant="normal">&#x0394;
+                            <!-- Δ -->
+                        </mi>
+                        <mi>t</mi>
+                        <mo stretchy="false">)</mo>
+                        <mo>=</mo>
+                        <mi>v</mi>
+                        <mo stretchy="false">(</mo>
+                        <mi>t</mi>
+                        <mo stretchy="false">)</mo>
+                        <mo>+</mo>
+                        <mfrac>
+                            <mrow>
+                                <mi mathvariant="normal">&#x0394;
+                                    <!-- Δ -->
+                                </mi>
+                                <mi>t</mi>
+                            </mrow>
+                            <mi>m</mi>
+                        </mfrac>
+                        <msubsup>
+                            <mi mathvariant="normal">&#x03A8;
+                                <!-- Ψ -->
+                            </mi>
+                            <mrow class="MJX-TeXAtom-ORD">
+                                <mi>i</mi>
+                            </mrow>
+                            <mrow class="MJX-TeXAtom-ORD">
+                                <mi>t</mi>
+                                <mi>o</mi>
+                                <mi>t</mi>
+                            </mrow>
+                        </msubsup>
+                        <mo stretchy="false">(</mo>
+                        <mi>t</mi>
+                        <mo stretchy="false">)</mo>
+                    </mrow>
+                </mstyle>
+            </math>
+        </p>
+        <p style="text-align:center">
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <mstyle displaystyle="true">
+                    <mrow class="MJX-TeXAtom-ORD">
+                        <mi>r</mi>
+                        <mo stretchy="false">(</mo>
+                        <mi>t</mi>
+                        <mo>+</mo>
+                        <mi mathvariant="normal">&#x0394;
+                            <!-- Δ -->
+                        </mi>
+                        <mi>t</mi>
+                        <mo stretchy="false">)</mo>
+                        <mo>=</mo>
+                        <mi>r</mi>
+                        <mo stretchy="false">(</mo>
+                        <mi>t</mi>
+                        <mo stretchy="false">)</mo>
+                        <mo>+</mo>
+                        <mi mathvariant="normal">&#x0394;
+                            <!-- Δ -->
+                        </mi>
+                        <mi>t</mi>
+                        <mi>v</mi>
+                        <mo stretchy="false">(</mo>
+                        <mi>t</mi>
+                        <mo stretchy="false">)</mo>
+                    </mrow>
+                </mstyle>
+            </math>
+        </p>
+
+        <p>
+            Particle position and velocity can be vectorized as opposed to assigned within several instance variables
+            for computational speed.
+            The firework will undergo two stages: flight before the detonation and after the
+            detonation.
+            During the first stage, the particles will be in a bundle and travel together.
+            Upon detonation, the particles will move radially outward in random directions before settling on the
+            ground.
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <mstyle displaystyle="true">
+                    <mrow class="MJX-TeXAtom-ORD">
+                        <msub>
+                            <mi>F</mi>
+                            <mrow class="MJX-TeXAtom-ORD">
+                                <mi>d</mi>
+                                <mo>,</mo>
+                                <mi>i</mi>
+                            </mrow>
+                        </msub>
+                    </mrow>
+                </mstyle>
+            </math>
+            is unique to each particle and computed at each time step
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <mstyle displaystyle="true">
+                    <mrow class="MJX-TeXAtom-ORD">
+                        <mi mathvariant="normal">&#x0394;
+                            <!-- Δ -->
+                        </mi>
+                        <mi>t</mi>
+                    </mrow>
+                </mstyle>
+            </math>
+            .
+
+        </p>
+
+        <p>
+            Particles that land on the floor will have landed and their positions will no longer be updated.
+        </p>
+
+        <h3> Smoke Dynamics </h3>
+        <p>
+            We’ve found several papers on real time smoke simulations, all cited in <a
+                href="https://www.youtube.com/watch?v=ljPj5Fos-LY">this</a> video. We’re concerned about the
+            smoke simulation running fast enough for the high FPS required for VR, so we will read up on the different
+            strategies to determine the cheapest method.
+        </p>
+        <p>
+            Unity uses HLSL (which seems similar to GLSL from project 4) as its shader language, so both the Smoke
+            Dynamics shader and Fragment Shader will be written in than.
+        </p>
+
+        <h3> Fragment Shader </h3>
+        <p>
+            The fireworks and smoke will be rendered using a fragment shader based on <a
+                href="https://www.youtube.com/watch?v=4QOcCGI6xOU">this</a> one by Sebastian Lague, which
+            uses a simplified ray tracing model to run in realtime.
+        </p>
+        <p>
+            The example shader will need to be modified to allow custom smoke densities (which we’ll generate using the
+            smoke fluid dynamics from before) and multiple light sources (from the firework particles)
+        </p>
+        <p>
+            We will likely need to also modify the fragment shader to work with the one Unity uses for VR, which might
+            require testing out different VR implementations (OpenXR, OculusVR, etc.) to find one that allows for shader
+            modification
+        <ul>
+            <li>
+                <a>As a backup, we can modify the fragment shader to be a texture shader for a plane hovering in front
+                    of the in-game camera, which should be computationally similar to applying both shaders
+                    sequentially.</a>
+            </li>
+        </ul>
+        </p>
+        <p>
+            We’ll start with a simplified linear model of firework particle luminance, but if the gpu can handle it we
+            could incorporate the thermodynamics from the firework paper to provide more physically accurate light
+            sources
+        </p>
+
+        <h2>Goals and Deliverbles</h2>
+        <div class="padded">
+            <p>
+                What we plan to deliver: a VR game in unity (with a heavy emphasis on custom compute and fragment
+                shaders) in which you can shoot physically accurate fireworks from your hands.
+            </p>
+            <p>
+                What we hope to deliver:
+            <ul>
+                <li>
+                    <a>Include particle bouncing </a>
+                </li>
+                <li>
+                    <a>Add more gameplay mechanics (targets to shoot at? scoreboards? multiplayer?)
+                    </a>
+                </li>
+            </ul>
+            </p>
+
+        </div>
+        <h2>Schedule</h2>
+        <div class="padded">
+            <p>
+                Week 1 (4/11)
+            <ul>
+                <li>
+                    <a>Tasks</a>
+                    <ul>
+                        <li>
+                            <a>Complete explicit Euler integration of particle dynamics</a>
+                        </li>
+                        <li>
+                            <a>Read Smoke simulation papers and determine how to approach the problem</a>
+                        </li>
+                        <li>
+                            <a>Learn syntax & implementation details for HLSL and how compute shaders work in Unity</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a>Deadlines: Project Proposal (4/11)</a>
+                </li>
+            </ul>
+            </p>
+            <p>
+                Week 2 (4/18)
+            <ul>
+                <li>
+                    <a>Tasks</a>
+                    <ul>
+                        <li>
+                            <a>Begin Smoke/Fragment shaders</a>
+                        </li>
+                        <li>
+                            <a>In a separate branch, determine how to integrate shaders into VR, work on basic gameplay.
+                                (VR features will be kept mostly separate from the rest of the project since not
+                                everyone in the group has a VR headset)</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a>Deadlines: N/A</a>
+                </li>
+            </ul>
+            </p>
+            <p>
+                Week 3 (4/25)
+            <ul>
+                <li>
+                    <a>Tasks</a>
+                    <ul>
+                        <li>
+                            <a>Continue work.</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a>Deadlines: Milestone Video, Webpage (4/26)</a>
+                </li>
+            </ul>
+            </p>
+            <p>
+                Week 4 (5/2)
+            <ul>
+                <li>
+                    <a>Tasks</a>
+                    <ul>
+                        <li>
+                            <a>Integrate non-VR shader branch with VR branch</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a>Deadlines: Final Presentation (5/4)</a>
+                </li>
+            </ul>
+            </p>
+            <p>
+                Week 5 (5/9)
+            <ul>
+                <li>
+                    <a>Tasks</a>
+                    <ul>
+                        <li>
+                            <a>Finishing touches</a>
+                        </li>
+                    </ul>
+                </li>
+                <li>
+                    <a>Deadlines: Final Video, Webpage (5/11)</a>
+                </li>
+            </ul>
+            </p>
+        </div>
+
+        <h2>Resources and References</h2>
+        <div class="padded">
+            <h3> References </h3>
+            <ul>
+                <li>
+                    <a
+                        href="http://cmmrl.berkeley.edu/zohdipaper/127.pdf">http://cmmrl.berkeley.edu/zohdipaper/127.pdf</a>
+                </li>
+                <li>
+                    <a href="http://austinhle.com/cs184proj-report">http://austinhle.com/cs184proj-report</a>
+                </li>
+                <li>
+                    <a
+                        href="https://www.youtube.com/watch?v=ljPj5Fos-LY">https://www.youtube.com/watch?v=ljPj5Fos-LY</a>
+                </li>
+                <li>
+                    <a
+                        href="https://www.youtube.com/watch?v=4QOcCGI6xOU">https://www.youtube.com/watch?v=4QOcCGI6xOU</a>
+                </li>
+            </ul>
+            <h3> Resources </h3>
+            <ul>
+                <li>
+                    C#
+                </li>
+                <li>
+                    Unity
+                </li>
+            </ul>
+        </div>
+    </div>
+
+
+</body>
+
+</html>
