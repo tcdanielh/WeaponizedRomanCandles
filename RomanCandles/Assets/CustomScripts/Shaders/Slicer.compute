@@ -1,0 +1,20 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+Texture3D<float4> volume;
+ RWTexture2D<float4> Result;
+ int layer;
+ float resolution;
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    uint3 pos = uint3(id.x, id.y, layer);
+    //float3 posf = id / float(resolution);
+    Result[id.xy] = volume[pos];
+    //Result[id.xy] = float4(id.x & id.y, (id.x & 15) / 15.0, (id.y & 15) / 15.0, 0.0);
+    //Result[id.xy] = float4(posf.x, posf.y, 0.0, 0.0);
+
+}

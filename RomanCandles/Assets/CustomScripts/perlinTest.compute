@@ -1,0 +1,75 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+RWTexture2D<float4> Result;
+RWStructuredBuffer<float3> grid;
+int numPoints;
+int resolution;
+float slice;
+
+// all functions based on wikipedia
+float interpolate(float a, float b, float t) {
+    //return a + ((b - a) * t);
+    return (b - a) * ((t * (t * 6 - 15) + 10) * t * t * t) + a;
+}
+
+float dotGridGradient(int3 corner, float3 p) {
+    int cIndex = corner.x + numPoints * (corner.y + corner.z * numPoints);
+    float3 gradient = grid[cIndex];
+
+    float3 d = p - float3(corner);
+    return dot(d, gradient);
+}
+
+float perlin(float3 p) {
+    int x0 = int(floor(p.x));
+    int x1 = int(ceil(p.x));
+    int y0 = int(floor(p.y));
+    int y1 = int(ceil(p.y));
+    int z0 = int(floor(p.z));
+    int z1 = int(ceil(p.z));
+
+    float sx = p.x - float(x0);
+    float sy = p.y - float(y0);
+    float sz = p.z - float(z0);
+
+    float n0;
+    float n1;
+    float ix0;
+    float ix1;
+    float iy0;
+    float iy1;
+
+    //z0 square
+    n0 = dotGridGradient(float3(x0, y0, z0), p);
+    n1 = dotGridGradient(float3(x1, y0, z0), p);
+    ix0 = interpolate(n0, n1, sx);
+    n0 = dotGridGradient(float3(x0, y1, z0), p);
+    n1 = dotGridGradient(float3(x1, y1, z0), p);
+    ix1 = interpolate(n0, n1, sx);
+    iy0 = interpolate(ix0, ix1, sy);
+    //return iy0;
+    //z1 square
+    n0 = dotGridGradient(float3(x0, y0, z1), p);
+    n1 = dotGridGradient(float3(x1, y0, z1), p);
+    ix0 = interpolate(n0, n1, sx);
+    n0 = dotGridGradient(float3(x0, y1, z1), p);
+    n1 = dotGridGradient(float3(x1, y1, z1), p);
+    ix1 = interpolate(n0, n1, sx);
+    iy1 = interpolate(ix0, ix1, sy);
+
+    return interpolate(iy0, iy1, sz);
+}
+
+[numthreads(8,8,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    float3 pos = id / float(resolution);
+    pos = float3(pos.x, pos.y, slice/float(resolution));
+    float perl = perlin(pos);
+    //Result[id.xy] = float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0);
+    Result[id.xy] = float4(perl, 0.0, 0.0, 0.0);
+
+}
