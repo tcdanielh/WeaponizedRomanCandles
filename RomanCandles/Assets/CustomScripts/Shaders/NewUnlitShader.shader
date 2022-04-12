@@ -58,6 +58,10 @@ Shader "Unlit/NewUnlitShader"
             float4 lColor;
             float lIntensity;
 
+            Texture2D<float4> ZeroB;
+            float sWidth;
+            float sHeight;
+
             float2 rayBoxIntersect(float3 bMin, float3 bMax, float3 ro, float3 rd) {
                 //calculate intersects for each axis-alligned slab
                 float3 t0 = (bMin - ro) / rd;
@@ -151,6 +155,7 @@ Shader "Unlit/NewUnlitShader"
                 //bool hit = (depth > 20);
                 if (hit) {
                     //1+ Bounce
+                    col = col + ZeroB[uint2(i.uv.x * sWidth, i.uv.y * sHeight)];
                     col = rayMarch(ro + (rd * rayBIntersect.x), rd, min(depth - rayBIntersect.x, rayBIntersect.y), rayBIntersect.y / numSteps, col);
                 }
                 return col;

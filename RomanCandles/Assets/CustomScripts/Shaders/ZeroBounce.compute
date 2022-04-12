@@ -3,13 +3,59 @@
 
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
-RWTexture2D<float4> Result;
-Texture2D<float4> Depth;
+struct Ejecta {
+    float3 pos;
+    float4 color;
+};
 
-[numthreads(8,1,1)]
-void CSMain (uint3 id : SV_DispatchThreadID)
+RWTexture2D<float4> Result;
+RWStructuredBuffer<Ejecta> Ejectas;
+float4x4 w2s;
+int cWidth;
+int cHeight;
+
+int2 WorldToScreen(float3 pos) {
+    //return int2(pos.xy);
+    float2 s = mul(w2s, float4(pos,1)).xy;
+    s = (s * 0.5) + 0.5;
+    return int2(int(s.x * float(cWidth)), int(s.y * float(cHeight)));
+}
+
+[numthreads(1,1,1)]
+void CSMain(uint3 id : SV_DispatchThreadID)
 {
     // TODO: insert actual code here!
+    Ejecta e = Ejectas[id.x];
+    //uint2 s = WorldToScreen(e.pos);
+    //uint2 s = uint2(50, 50);
 
-    Result[id.xy] = float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0);
+    //for (uint i = max(0,s.x-100); i < min(cWidth,s.x+100); i++) {
+    //    for (uint j = max(0, s.y - 100); i < min(cWidth, s.y + 100); j++) {
+    //        Result[uint2(i,j)] = e.color;
+    //    }
+    //}
+
+    //for (uint i = s.x - 100; i < s.x + 100; i++) {
+    //    for (uint j =  s.y - 100; i <  s.y + 100; j++) {
+    //        Result[id.xy] = e.color;
+    //    }
+    //}
+
+    float4 s = mul(w2s, float4(e.pos, 1));
+    if (s.w < 0) {
+        return;
+    }
+    s = s / s.w;
+    s = (s * 0.5) + 0.5;
+    float f = 0;
+    if (s.x > -1) {
+        f = 1;
+    }
+    uint2 sc = int2(int(s.x * float(cWidth)), int(s.y * float(cHeight)));
+    Result[sc] = e.color;
+    for (uint i = max(0,sc.x-5); i < min(cWidth,sc.x+5); i++) {
+        for (uint j = max(0, sc.y - 5); j < min(cWidth, sc.y + 5); j++) {
+            Result[uint2(i,j)] = e.color;
+        }
+    }
 }
