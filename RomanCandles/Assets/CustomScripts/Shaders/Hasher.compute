@@ -1,0 +1,38 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel CSMain
+
+struct Ejecta {
+    float3 pos;
+    float4 color;
+};
+RWStructuredBuffer<Ejecta> Ejectas;
+RWStructuredBuffer<Ejecta> Hash;
+float4 gridSize;
+float4 gridMin;
+float binLength; //length of each bin in worldspace
+int binSize; //maximum number of ejecta per bin
+int3 binsPerAxis;
+
+int3 binCoord(float3 pos) {
+    float3 relativePos = pos - gridMin.xyz;
+    int3 posI = int3(floor(pos/binLength));
+    return posI;
+}
+
+int bin(float3 pos) {
+    int3 coord = binCoord(pos);
+    return coord.x + binsPerAxis.x * (coord.y + binsPerAxis.y * coord.z);
+}
+
+[numthreads(10,1,1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    Ejecta e = Ejectas[id.x];
+    int b = bin(e.pos);
+    for (int i = b*binSize; i < (b+1)*binSize; i++) {
+        if (Hash[i].pos.y == 0) {
+            Hash[i] = e;
+            break;
+        }
+    }
+}

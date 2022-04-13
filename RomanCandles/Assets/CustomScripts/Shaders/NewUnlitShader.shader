@@ -48,6 +48,7 @@ Shader "Unlit/NewUnlitShader"
             float3 BoundsMax;
             Texture3D<float4> Shape;
             SamplerState samplerShape;
+            float smokeScale;
 
             float numSteps;
             float numStepsLight;
@@ -57,10 +58,7 @@ Shader "Unlit/NewUnlitShader"
             float4 lPos;
             float4 lColor;
             float lIntensity;
-
-            Texture2D<float4> ZeroB;
-            float sWidth;
-            float sHeight;
+            float lRadius;
 
             float2 rayBoxIntersect(float3 bMin, float3 bMax, float3 ro, float3 rd) {
                 //calculate intersects for each axis-alligned slab
@@ -83,14 +81,36 @@ Shader "Unlit/NewUnlitShader"
                 //TODO replace with actuall function
                 //float2 noise = (frac(sin(dot(uv, float2(12.9898, 78.233) * 2.0)) * 43758.5453));
                 //return min(1, abs(noise.x + noise.y) * 0.5);
-
-                //float4 samp = Shape.SampleLevel(samplerShape, p,0);
+                p = p * smokeScale * 0.01;
+                float4 samp = Shape.SampleLevel(samplerShape, p,0);
+                return samp.x;
                 //uint3 pos = uint3(uint(floor(p.x * 30)) % 256, uint(floor(p.y * 30)) % 256, uint(floor(p.z * 30)) % 256);
                 //float4 samp = Shape[pos];
                 //float density = max(0, samp.r);
                 //return density;
 
-                return max(0, sin(p.x) + sin(p.y * 0.5) + sin(p.z * 0.1))/3.0;
+                //return max(0, sin(p.x) + sin(p.y * 0.5) + sin(p.z * 0.1))/3.0;
+            }
+
+            float3 zeroLight(float3 ro, float3 rd, float stepSize) {
+                float3 rl = normalize(lPos - ro);
+                float distToLight = length(lPos - ro);
+                float rcos = max(0, dot(rd, rl)) * distToLight;
+                //if (rcos < stepSize) return float3(1, 1, 1);
+                //return float3(0, 0, 0);
+                if (rcos > stepSize) return float3(0, 0, 0);
+                
+                float r2 = distToLight * distToLight;
+                float distToCenter2 = r2 - (rcos * rcos);
+                if (distToCenter2 > lRadius * lRadius) return float3(0, 0, 0);
+                //float bri = -r2 + (rcos * rcos) + (lRadius*lRadius);
+                //if (bri > 0) return float3(1, 1, 1);
+                //bri = max(0, bri);
+                float bri = lRadius * lRadius / (distToCenter2);
+                bri = bri - 1;
+                bri = min(bri, 10);
+                return lColor * bri * lIntensity;
+                //TODO: make render stop here so point lights are opaque?
             }
 
             //return estimate of how much light reaches a given point
@@ -114,15 +134,6 @@ Shader "Unlit/NewUnlitShader"
 
             //returns color of smoke
             float4 rayMarch(float3 ro, float3 rd, float maxD, float stepSize, float4 b) {
-                //float t = 0;
-                //float totalDensity = 0;
-                //while (t < maxD) {
-                //    float3 p = ro + (rd * t);
-                //    totalDensity += (sampleDensity(p) * stepSize);
-                //    t += stepSize;
-                //}
-                ////return float4(0, 0, 0, 0);
-                //return b * exp(-totalDensity);
 
                 float t = 0;
                 float transmit = 1;
@@ -133,10 +144,12 @@ Shader "Unlit/NewUnlitShader"
                     float pointDensity = sampleDensity(p);
                     transmit *= exp(-stepSize * pointDensity * smokeLightAbsorb);
                     smokeDiffuse += pointDensity * pointLight * transmit;
+                    smokeDiffuse += zeroLight(p, rd, stepSize) * transmit;
+                    
                     if (transmit < 0.01) break;
                     t += stepSize;
                 }
-                return (b * transmit) + float4(smokeDiffuse,0.0);
+                return (b * transmit) + float4(smokeDiffuse, 0.0);
             }
 
             fixed4 frag(v2f i) : SV_Target
@@ -154,8 +167,6 @@ Shader "Unlit/NewUnlitShader"
                 bool hit = ((rayBIntersect.y > 0.0) && (rayBIntersect.x < depth));
                 //bool hit = (depth > 20);
                 if (hit) {
-                    //1+ Bounce
-                    col = col + ZeroB[uint2(i.uv.x * sWidth, i.uv.y * sHeight)];
                     col = rayMarch(ro + (rd * rayBIntersect.x), rd, min(depth - rayBIntersect.x, rayBIntersect.y), rayBIntersect.y / numSteps, col);
                 }
                 return col;

@@ -66,6 +66,7 @@
     <None Include="Assets\CustomScripts\Shaders\Slicer.compute" />
     <None Include="Assets\CustomScripts\perlinTest.compute" />
     <None Include="Assets\CustomScripts\Shaders\NewComputeShader.compute" />
+    <None Include="Assets\CustomScripts\Shaders\Hasher.compute" />
     <None Include="Assets\CustomScripts\Shaders\PerlinNoiseCompute.compute" />
     <None Include="Assets\CustomScripts\Shaders\Default.compute" />
     <None Include="Assets\CustomScripts\Shaders\NewUnlitShader.shader" />
