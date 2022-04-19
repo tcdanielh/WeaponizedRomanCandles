@@ -60,6 +60,8 @@
     <Compile Include="Assets\CustomScripts\ComputeShaderTest.cs" />
     <Compile Include="Assets\CustomScripts\SmokeRender.cs" />
     <Compile Include="Assets\CustomScripts\ScreenWriter.cs" />
+    <Compile Include="Assets\CustomScripts\FireworkSim.cs" />
+    <Compile Include="Assets\CustomScripts\SmokeSim.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Assets\CustomScripts\Shaders\ZeroBounce.compute" />
