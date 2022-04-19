@@ -37,6 +37,7 @@ public class ScreenWriter : MonoBehaviour
         public Vector3 pos;
         public Vector3 v;
         public Vector4 color;
+        public bool landed = false;
     }
 
 
@@ -123,6 +124,7 @@ public class ScreenWriter : MonoBehaviour
 
     }
     
+    // we could also include parameters for angles in spherical coordinates
     private void firework(Ejecta[] es)
     {   /* Physical Parameters */
         double g = 9.81;    // gravitational acceleration [m/s]
@@ -136,16 +138,73 @@ public class ScreenWriter : MonoBehaviour
         double rho_p = 2000;    // projectile density [kg/m^3]
         Vector3 v_a = new Vector3(0,0,0);  // air velocity [m/s]
         double m_s = 2; // inert structural mass [kg]
+        
+
+        // options to change burst radius, flight time, accuracy
+        double m_e = 5; // explosive charge mass [kg]
+        double m_f = 10;    // launch charge mass [kg]
+        double t_e = 5; // time of explsion [sec]
+        double dt = 0.001;  // time step [sec]
+
         double m_i = 4 / 3 * Mathf.PI * Mathf.Pow((float)R_p, 3) * rho_p;  // mass of ejecta 
         double m_p = N_p * m_i; // total mass of ejecta
-
-        double m_e = 5; // explosive charge mass [kg]
+        double A_px = Mathf.PI * Mathf.pow((float)R_p, 2);  // cross-sectional area of ejecta
         double deltav = Mathf.Sqrt((float)(2 * eta * H_e * m_e / m_p));   // change in speed after detonation
-        double m_f = 10;    // launch charge mass [kg]
+        
         double m_r = m_p + m_e + m_s;   // total rocket mass [kg]
-        Vector3 vt0 = new Vector3(0, 0, Mathf.Sqrt((float)(2 * eta * H_e * m_f / m_r)));    // initial velocity [m/s]
+        Vector3 v_0 = new Vector3(0, 0, Mathf.Sqrt((float)(2 * eta * H_e * m_f / m_r)));    // initial velocity [m/s]
+
+        /* Rocket Ascent */
+        // mark time for when rocket is launched
+        Vector3 F_gr = new Vector3(0., 0., -g * m_r);   // force of gravity on rocket [N]
+        
+        int num_steps_ascent = t_e / dt + 1; 
+        double[] discrete_time_ascent = new double[num_steps_ascent];
+        for (int i = 0; i < num_steps_ascent; i++)
+        {
+            discrete_time_ascent[i] = dt * (double) i;
+        }
+        Vector3 F_drag = new Vector3((v_a - v_0).x, (v_a - v_0).y, (v_a - v_0).z); 
+        F_drag = F_drag * 0.5 * coeff_drag(R_r, rho_a, v_0, v_a, mu_a) * (v_a - v_0).magnitude * Mathf.PI * Mathf.pow(R_r, 2);
+        Vector3d psi_tot = new Vector3d(0.);
+        // time stepping loop during ascent
+        foreach (double time in discrete_time_ascent)
+        {
+            foreach (Ejecta e in es)
+            {
+                psi_tot = F_drag + F_gr;
+                e.v = e.v + dt / m_r * psi_tot;
+                e.pos = e.pos + dt * e.v;
+            }
+        }
+
+        /* EXPLOSION!!! */
+        Vector3 blast_origin = es[0].pos;
 
         
 
+    }
+    
+    private double coeff_drag(double radius, double rho_a, Vector3 v, Vector3 v_a, double mu_a)
+    {
+        double cd;
+        double Re = (2 * radius * rho_a * (v - v_a).magnitude) / mu_a;
+        if (Re > 2e6)
+        {
+            cd = 0.18;
+        } else if (Re <= 2e6 && Re > 3e5)
+        {
+            cd = 3.66e-4 * Mathf.pow(Re, 0.4275);
+        } else if (Re <= 3e5 & Re > 400.)
+        {
+            cd = 0.5;
+        } else if (Re <= 400 && Re > 1)
+        {
+            cd = 24. * Mathf.pow(Re, -.646);
+        } else if (Re < 1)
+        {
+            cd = 24. / Re;
+        }
+        return cd;
     }
 }
