@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class SmokeSim : MonoBehaviour
 {
-    public ComputeBuffer smokeDensityBuffer;
+    public Texture3D smokeDensity;
     //other buffer variables go here
     // Start is called before the first frame update
     void Start()

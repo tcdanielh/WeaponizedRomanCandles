@@ -42,8 +42,12 @@ public class ScreenWriter : MonoBehaviour
 
     public int EjectaSize = sizeof(float) * 7;
 
+    private SmokeSim smokeSim;
+    private FireworkSim fireworkSim;
     private void Start()
     {
+        smokeSim = GetComponent<SmokeSim>();
+        fireworkSim = GetComponent<FireworkSim>();
         cam = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
 
         Vector3 smokeGridCells = SmokeGridDimensions / SmokeCellSideLength;
@@ -107,6 +111,7 @@ public class ScreenWriter : MonoBehaviour
         material.SetVector("BoundsMin", container.position - container.localScale / 2);
         material.SetVector("BoundsMax", container.position + container.localScale / 2);
         material.SetTexture("Shape", smoke.getPerlinTexture());
+        //material.SetTexture("Shape", smokeSim.smokeDensity);
         material.SetInt("numSteps", 20);
         material.SetInt("numStepsLight", 20);
         material.SetVector("lPos", lightPoint.position);
