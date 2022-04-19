@@ -149,7 +149,6 @@ public class ScreenWriter : MonoBehaviour
         double m_i = 4 / 3 * Mathf.PI * Mathf.Pow((float)R_p, 3) * rho_p;  // mass of ejecta 
         double m_p = N_p * m_i; // total mass of ejecta
         double A_px = Mathf.PI * Mathf.pow((float)R_p, 2);  // cross-sectional area of ejecta
-        double deltav = Mathf.Sqrt((float)(2 * eta * H_e * m_e / m_p));   // change in speed after detonation
         
         double m_r = m_p + m_e + m_s;   // total rocket mass [kg]
         Vector3 v_0 = new Vector3(0, 0, Mathf.Sqrt((float)(2 * eta * H_e * m_f / m_r)));    // initial velocity [m/s]
@@ -183,8 +182,8 @@ public class ScreenWriter : MonoBehaviour
 
         /* EXPLOSION!!! */
         Vector3 blast_origin = es[0].pos;
+        double deltav = Mathf.Sqrt((float)(2 * eta * H_e * m_e / m_p));   // change in speed after detonation
 
-        
 
     }
     
