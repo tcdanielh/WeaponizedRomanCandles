@@ -155,7 +155,8 @@ public class ScreenWriter : MonoBehaviour
         Vector3 v_0 = new Vector3(0, 0, Mathf.Sqrt((float)(2 * eta * H_e * m_f / m_r)));    // initial velocity [m/s]
 
         /* Rocket Ascent */
-        // mark time for when rocket is launched
+        // TODO: mark time for when rocket is launched
+
         Vector3 F_gr = new Vector3(0., 0., -g * m_r);   // force of gravity on rocket [N]
         
         int num_steps_ascent = t_e / dt + 1; 
@@ -175,6 +176,8 @@ public class ScreenWriter : MonoBehaviour
                 psi_tot = F_drag + F_gr;
                 e.v = e.v + dt / m_r * psi_tot;
                 e.pos = e.pos + dt * e.v;
+
+                // TODO: use fixedUpdate method
             }
         }
 
