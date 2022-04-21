@@ -37,7 +37,8 @@ public class ScreenWriter : MonoBehaviour
         public Vector3 pos;
         public Vector3 v;
         public Vector4 color;
-        public bool landed = false;
+        public bool landed;
+        
     }
 
 
@@ -135,50 +136,50 @@ public class ScreenWriter : MonoBehaviour
         float R_p = 0.005f; // projectile radius
         float R_r = .2f;    // firework radius
         float rho_a = 1.225f;   // air density [kg/m^3]
-        float rho_p = 2000.f;    // projectile density [kg/m^3]
-        Vector3 v_a = new Vector3(0,0,0);  // air velocity [m/s]
-        float m_s = 2.f; // inert structural mass [kg]
+        float rho_p = 2000f;    // projectile density [kg/m^3]
+        Vector3 v_a = new Vector3(0f,0f,0f);  // air velocity [m/s]
+        float m_s = 2f; // inert structural mass [kg]
         
 
         // options to change burst radius, flight time, accuracy
-        float m_e = 5.f; // explosive charge mass [kg]
-        float m_f = 10.f;    // launch charge mass [kg]
-        float t_e = 5.f; // time of explsion [sec]
+        float m_e = 5f; // explosive charge mass [kg]
+        float m_f = 10f;    // launch charge mass [kg]
+        float t_e = 5f; // time of explsion [sec]
         float dt = 0.001f;  // time step [sec]
 
-        float m_i = 4.f / 3.f * Mathf.PI * Mathf.Pow((float)R_p, 3) * rho_p;  // mass of ejecta 
+        float m_i = 4f / 3f * Mathf.PI * Mathf.Pow((float)R_p, 3) * rho_p;  // mass of ejecta 
         float m_p = N_p * m_i; // total mass of ejecta
-        float A_px = Mathf.PI * Mathf.pow((float)R_p, 2);  // cross-sectional area of ejecta
+        float A_px = Mathf.PI * Mathf.Pow((float)R_p, 2);  // cross-sectional area of ejecta
         
         float m_r = m_p + m_e + m_s;   // total rocket mass [kg]
-        Vector3 v_0 = new Vector3(0, 0, Mathf.Sqrt((float)(2 * eta * H_e * m_f / m_r)));    // initial velocity [m/s]
+        Vector3 v_0 = new Vector3(0, 0, Mathf.Sqrt((float)(2f * eta * H_e * m_f / m_r)));    // initial velocity [m/s]
 
         /* Rocket Ascent */
         // TODO: mark time for when rocket is launched
 
-        Vector3 F_gr = new Vector3(0., 0., -g * m_r);   // force of gravity on rocket [N]
+        Vector3 F_gr = new Vector3(0f, 0f, -g * m_r);   // force of gravity on rocket [N]
         foreach (Ejecta e in es)
         {
-            e.v = v_0;  // initial velocity at time = 0
+            e.v.Set(v_0.x, v_0.y, v_0.z);  // initial velocity at time = 0
         }
-        int num_steps_ascent = t_e / dt; 
+        int num_steps_ascent = Mathf.CeilToInt(t_e / dt); 
         float[] discrete_time_ascent = new float[num_steps_ascent];
         for (int i = 0; i < num_steps_ascent; i++)
         {
             discrete_time_ascent[i] = dt * (float) (i-1);
         }
-        Vector3 F_drag = new Vector3(0.); 
-        Vector3 psi_tot = new Vector3d(0.);
+        Vector3 F_drag = new Vector3(0f, 0f, 0f); 
+        Vector3 psi_tot = new Vector3(0f, 0f, 0f);
         // time stepping loop during ascent
         foreach (float dt_i in discrete_time_ascent) 
         {
             foreach (Ejecta e in es)
             {
-                F_drag = 0.5f * Mathf.PI * Mathf.pow(R_r, 2) * coeff_drag(R_r, rho_a, e.v, v_a, mu_a) * 
-                    (v_a - e.v).magnitude *  * (v_a - e.v);
+                F_drag = 0.5f * Mathf.PI * Mathf.Pow(R_r, 2) * coeff_drag(R_r, rho_a, e.v, v_a, mu_a) * 
+                    (v_a - e.v).magnitude * (v_a - e.v);
                 psi_tot = F_drag + F_gr;
-                e.v = e.v + dt / m_r * psi_tot;
-                e.pos = e.pos + dt * e.v;
+                e.v.Set((e.v + dt / m_r * psi_tot).x, (e.v + dt / m_r * psi_tot).y, (e.v + dt / m_r * psi_tot).z);
+                e.pos.Set((e.pos + dt * e.v).x, (e.pos + dt * e.v).y, (e.pos + dt * e.v).z);
 
                 // TODO: use fixedUpdate method
             }
@@ -194,23 +195,23 @@ public class ScreenWriter : MonoBehaviour
     
     private float coeff_drag(float radius, float rho_a, Vector3 v, Vector3 v_a, float mu_a)
     {
-        float cd;
+        float cd = 1000;
         float Re = (2f * radius * rho_a * (v - v_a).magnitude) / mu_a;
         if (Re > 2e6f)
         {
-            cd = 0.18;
+            cd = 0.18f;
         } else if (Re <= 2e6f && Re > 3e5f)
         {
-            cd = 3.66e-4f * Mathf.pow(Re, 0.4275f);
-        } else if (Re <= 3e5f & Re > 400.f)
+            cd = 3.66e-4f * Mathf.Pow(Re, 0.4275f);
+        } else if (Re <= 3e5f & Re > 400f)
         {
             cd = 0.5f;
         } else if (Re <= 400f && Re > 1f)
         {
-            cd = 24f * Mathf.pow(Re, -.646f);
+            cd = 24f * Mathf.Pow(Re, -.646f);
         } else if (Re < 1f)
         {
-            cd = 24.f / Re;
+            cd = 24f / Re;
         }
         return cd;
     }
