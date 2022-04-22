@@ -169,7 +169,7 @@ public class ScreenWriter : MonoBehaviour
         {
             discrete_time_ascent[i] = dt * (float) (i-1);
         }
-        Vector3 F_drag = new Vector3(0f, 0f, 0f); 
+        Vector3 F_di = new Vector3(0f, 0f, 0f); 
         Vector3 psi_tot = new Vector3(0f, 0f, 0f);
         // time stepping loop during ascent
         foreach (float dt_i in discrete_time_ascent) 
@@ -178,9 +178,9 @@ public class ScreenWriter : MonoBehaviour
             for (int i = 0; i < es.Length; i++)
             {
                 Ejecta e = es[i]; 
-                F_drag = 0.5f * Mathf.PI * Mathf.Pow(R_r, 2) * coeff_drag(R_r, rho_a, e.v, v_a, mu_a) * 
+                F_di = 0.5f * Mathf.PI * Mathf.Pow(R_r, 2) * coeff_drag(R_r, rho_a, e.v, v_a, mu_a) * 
                     (v_a - e.v).magnitude * (v_a - e.v);
-                psi_tot = F_drag + F_gr;
+                psi_tot = F_di + F_gr;
 
                 // perform explicit Euler integration
                 e.v.Set((e.v + dt / m_r * psi_tot).x, (e.v + dt / m_r * psi_tot).y, (e.v + dt / m_r * psi_tot).z);
@@ -196,8 +196,8 @@ public class ScreenWriter : MonoBehaviour
         float deltav = Mathf.Sqrt((float)(2 * eta * H_e * m_e / m_p));   // change in speed after detonation
         float eps_1;  
         float eps_2;  // TODO: Change to random variable [0,1]
-        float theta_s;  // spherical coordinate uniform distribution RNV
-        float phi_s;    // sphereical coordinate uniform distribution RNV
+        float theta_s;  // spherical polar angle RNV
+        float phi_s;    // spherical azimuthal angle RNV
         Vector3 n_i = new Vector3(0f, 0f, 0f);  // velocity trajectory
         for (int i = 0; i < es.Length; i++)
         {
@@ -230,21 +230,20 @@ public class ScreenWriter : MonoBehaviour
             for (int i = 0; i < es.Length; i++)
             {
                 Ejecta e = es[i];
-                F_drag = 0.5f * Mathf.PI * Mathf.Pow(R_r, 2) * coeff_drag(R_r, rho_a, e.v, v_a, mu_a) *
-                    (v_a - e.v).magnitude * (v_a - e.v);
-                psi_tot = F_drag + F_gi;
 
-                
                 if (e.pos.z <= 0f)  // at or below the z=0 plane
                 {
                     e.landed = true;
                     e.pos.Set(e.pos.x, e.pos.y, 0f);
                     num_landed++;
-                }
+                }     
 
                 // perform explicit Euler integration on particles in flight
                 if (!e.landed) 
                 {
+                    F_di = 0.5f * Mathf.PI * Mathf.Pow(R_p, 2) * coeff_drag(R_p, rho_a, e.v, v_a, mu_a) *
+                    (v_a - e.v).magnitude * (v_a - e.v);
+                    psi_tot = F_di + F_gi;
                     e.v.Set((e.v + dt / m_r * psi_tot).x, (e.v + dt / m_r * psi_tot).y, (e.v + dt / m_r * psi_tot).z);
                     e.pos.Set((e.pos + dt * e.v).x, (e.pos + dt * e.v).y, (e.pos + dt * e.v).z);
                 }
