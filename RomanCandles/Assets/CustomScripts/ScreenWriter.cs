@@ -125,7 +125,11 @@ public class ScreenWriter : MonoBehaviour
 
     }
     
-    // we could also include parameters for angles in spherical coordinates
+    
+    /* This function is a physics-based simulation of a fragmenting explosion from a firework.
+    All ejecta travel together in a rocket prior to the explosion at time = t_e. 
+    For simplicity, everything is a sphere. */
+    // TODO: we could also include spherical coordinate parameters/angles
     private void firework(Ejecta[] es)
     {   /* Physical Parameters */
         float g = 9.81f;    // gravitational acceleration [m/s]
@@ -156,12 +160,13 @@ public class ScreenWriter : MonoBehaviour
         Vector3 v_0 = new Vector3(0, 0, Mathf.Sqrt((float)(2f * eta * H_e * m_f / m_r)));    // initial velocity [m/s]
 
         /* Rocket Ascent */
-        // TODO: mark time for when rocket is launched
+        // TODO: mark time for when rocket is launched with in-game clock
 
         Vector3 F_gr = new Vector3(0f, 0f, -g * m_r);   // force of gravity on rocket [N] along -z
         foreach (Ejecta e in es)
         {
             e.v.Set(v_0.x, v_0.y, v_0.z);  // initial velocity at time = 0
+            e.pos.Set(0f, 0f, 0f);  // rocket starts at the origin (0, 0, 0)
         }
         int num_steps_ascent = Mathf.CeilToInt(t_e / dt); 
         float[] discrete_time_ascent = new float[num_steps_ascent];
@@ -186,7 +191,10 @@ public class ScreenWriter : MonoBehaviour
                 e.v.Set((e.v + dt / m_r * psi_tot).x, (e.v + dt / m_r * psi_tot).y, (e.v + dt / m_r * psi_tot).z);
                 e.pos.Set((e.pos + dt * e.v).x, (e.pos + dt * e.v).y, (e.pos + dt * e.v).z);
 
-                // TODO: use fixedUpdate method
+                // TODO: use fixedUpdate method and display objects in scene
+                // example: if (timeNow == dt_i + timeStart) => show object in scene
+
+                // TODO: Insert rocket's smoke trail?
             }
 
         }
@@ -195,7 +203,7 @@ public class ScreenWriter : MonoBehaviour
         Vector3 blast_origin = es[0].pos;   // place puff of smoke here
         float deltav = Mathf.Sqrt((float)(2 * eta * H_e * m_e / m_p));   // change in speed after detonation
         float eps_1;  
-        float eps_2;  // TODO: Change to random variable [0,1]
+        float eps_2;
         float theta_s;  // spherical polar angle RNV
         float phi_s;    // spherical azimuthal angle RNV
         Vector3 n_i = new Vector3(0f, 0f, 0f);  // velocity trajectory
@@ -231,7 +239,7 @@ public class ScreenWriter : MonoBehaviour
             {
                 Ejecta e = es[i];
 
-                if (e.pos.z <= 0f)  // at or below the z=0 plane
+                if (e.pos.z <= 0f)  // TODO: landing criteria at or below the z=0 plane? Can change
                 {
                     e.landed = true;
                     e.pos.Set(e.pos.x, e.pos.y, 0f);
@@ -246,10 +254,14 @@ public class ScreenWriter : MonoBehaviour
                     psi_tot = F_di + F_gi;
                     e.v.Set((e.v + dt / m_r * psi_tot).x, (e.v + dt / m_r * psi_tot).y, (e.v + dt / m_r * psi_tot).z);
                     e.pos.Set((e.pos + dt * e.v).x, (e.pos + dt * e.v).y, (e.pos + dt * e.v).z);
+
+                    // TODO: use fixedUpdate method and display objects in scene as time elapses
                 }
-                
+
             }
         }
+
+        // TODO: erase ejecta from scene after set amount of time?
     }
     
     private float coeff_drag(float radius, float rho_a, Vector3 v, Vector3 v_a, float mu_a)
