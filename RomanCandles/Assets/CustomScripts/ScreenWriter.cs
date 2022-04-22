@@ -147,7 +147,8 @@ public class ScreenWriter : MonoBehaviour
         float t_e = 5f; // time of explsion [sec]
         float dt = 0.001f;  // time step [sec]
 
-        float m_i = 4f / 3f * Mathf.PI * Mathf.Pow((float)R_p, 3) * rho_p;  // mass of ejecta 
+        float m_i = 4f / 3f * Mathf.PI * Mathf.Pow((float)R_p, 3) * rho_p;  // mass of ejecta [kg]
+        Vector3 F_gi = new Vector3(0f, 0f, m_i * -g);   // weight of ejecta [N]
         float m_p = N_p * m_i; // total mass of ejecta
         float A_px = Mathf.PI * Mathf.Pow((float)R_p, 2);  // cross-sectional area of ejecta
         
@@ -157,7 +158,7 @@ public class ScreenWriter : MonoBehaviour
         /* Rocket Ascent */
         // TODO: mark time for when rocket is launched
 
-        Vector3 F_gr = new Vector3(0f, 0f, -g * m_r);   // force of gravity on rocket [N]
+        Vector3 F_gr = new Vector3(0f, 0f, -g * m_r);   // force of gravity on rocket [N] along -z
         foreach (Ejecta e in es)
         {
             e.v.Set(v_0.x, v_0.y, v_0.z);  // initial velocity at time = 0
@@ -173,11 +174,15 @@ public class ScreenWriter : MonoBehaviour
         // time stepping loop during ascent
         foreach (float dt_i in discrete_time_ascent) 
         {
-            foreach (Ejecta e in es)
+            //foreach (Ejecta e in es)
+            for (int i = 0; i < es.Length; i++)
             {
+                Ejecta e = es[i]; 
                 F_drag = 0.5f * Mathf.PI * Mathf.Pow(R_r, 2) * coeff_drag(R_r, rho_a, e.v, v_a, mu_a) * 
                     (v_a - e.v).magnitude * (v_a - e.v);
                 psi_tot = F_drag + F_gr;
+
+                // perform explicit Euler integration
                 e.v.Set((e.v + dt / m_r * psi_tot).x, (e.v + dt / m_r * psi_tot).y, (e.v + dt / m_r * psi_tot).z);
                 e.pos.Set((e.pos + dt * e.v).x, (e.pos + dt * e.v).y, (e.pos + dt * e.v).z);
 
@@ -187,10 +192,65 @@ public class ScreenWriter : MonoBehaviour
         }
 
         /* EXPLOSION!!! */
-        Vector3 blast_origin = es[0].pos;
+        Vector3 blast_origin = es[0].pos;   // place puff of smoke here
         float deltav = Mathf.Sqrt((float)(2 * eta * H_e * m_e / m_p));   // change in speed after detonation
+        float eps_1;  
+        float eps_2;  // TODO: Change to random variable [0,1]
+        float theta_s;  // spherical coordinate uniform distribution RNV
+        float phi_s;    // sphereical coordinate uniform distribution RNV
+        Vector3 n_i = new Vector3(0f, 0f, 0f);  // velocity trajectory
+        for (int i = 0; i < es.Length; i++)
+        {
+            Ejecta e = es[i];
+            eps_1 = 0.5f; // TODO: Change to random variable [0,1]
+            eps_2 = 0.5f; // TODO: Change to random variable [0,1]
+            theta_s = 2f * Mathf.PI * eps_1;
+            phi_s = Mathf.Acos(1f - 2f * eps_2);
+            
+            // set new position from fragmenting blast
+            e.pos.Set(e.pos.x + R_r * Mathf.Cos(theta_s) * Mathf.Sin(phi_s),
+                e.pos.y + R_r * Mathf.Sin(theta_s) * Mathf.Sin(phi_s),
+                e.pos.z + R_r * Mathf.Cos(phi_s));
 
+            // trajectory calculation
+            n_i.Set((e.pos.x - blast_origin.x) / (e.pos - blast_origin).magnitude,
+                (e.pos.y - blast_origin.y) / (e.pos - blast_origin).magnitude,
+                (e.pos.z - blast_origin.z) / (e.pos - blast_origin).magnitude);
+            // set velocity
+            e.v.Set(e.v.x + deltav * n_i.x, e.v.y + deltav * n_i.y, e.v.z + deltav * n_i.z);
+        }
+        
 
+        /* Particle Descent */
+        int num_landed = 0;
+        while (num_landed < N_p)
+        {
+
+            //foreach (Ejecta e in es)
+            for (int i = 0; i < es.Length; i++)
+            {
+                Ejecta e = es[i];
+                F_drag = 0.5f * Mathf.PI * Mathf.Pow(R_r, 2) * coeff_drag(R_r, rho_a, e.v, v_a, mu_a) *
+                    (v_a - e.v).magnitude * (v_a - e.v);
+                psi_tot = F_drag + F_gi;
+
+                
+                if (e.pos.z <= 0f)  // at or below the z=0 plane
+                {
+                    e.landed = true;
+                    e.pos.Set(e.pos.x, e.pos.y, 0f);
+                    num_landed++;
+                }
+
+                // perform explicit Euler integration on particles in flight
+                if (!e.landed) 
+                {
+                    e.v.Set((e.v + dt / m_r * psi_tot).x, (e.v + dt / m_r * psi_tot).y, (e.v + dt / m_r * psi_tot).z);
+                    e.pos.Set((e.pos + dt * e.v).x, (e.pos + dt * e.v).y, (e.pos + dt * e.v).z);
+                }
+                
+            }
+        }
     }
     
     private float coeff_drag(float radius, float rho_a, Vector3 v, Vector3 v_a, float mu_a)
@@ -209,10 +269,12 @@ public class ScreenWriter : MonoBehaviour
         } else if (Re <= 400f && Re > 1f)
         {
             cd = 24f * Mathf.Pow(Re, -.646f);
-        } else if (Re < 1f)
+        } else if (Re <= 1f)
         {
             cd = 24f / Re;
         }
         return cd;
     }
+    
+    
 }
