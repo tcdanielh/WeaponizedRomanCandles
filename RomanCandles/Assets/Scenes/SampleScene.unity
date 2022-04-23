@@ -139,7 +139,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &398897645
 Light:
   m_ObjectHideFlags: 0
@@ -232,7 +232,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &595973274
 Light:
   m_ObjectHideFlags: 0
@@ -420,7 +420,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &694192454
 Light:
   m_ObjectHideFlags: 0
@@ -608,7 +608,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &738848113
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -800,11 +800,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 252cce67e2674824b8cd217ec88a32dd, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  smokeColor: {r: 0.8301887, g: 0.8301887, b: 0.8301887, a: 0}
   SmokeCellSideLength: 0.05
   SmokeGridDimensions: {x: 10, y: 10, z: 10}
   hashBinSideLength: 1
   EjectaPerBin: 5
-  gridMinPoint: {x: 0, y: 0, z: 0}
+  gridMinPoint: {x: -10, y: 0, z: -10}
   shader: {fileID: 4800000, guid: aaec266f2e93e4c41acbd4aaf6193019, type: 3}
   EjectaHasher: {fileID: 7200000, guid: 14fa0603f116c7f4fb032fd5ca94cbff, type: 3}
   container: {fileID: 629654122}
@@ -823,6 +824,8 @@ MonoBehaviour:
   - {fileID: 1817819956}
   - {fileID: 1188041263}
   ejectaLightIntensity: 1
+  ejectaColor: {r: 1, g: 0.2028302, b: 0.2028302, a: 0}
+  sun: {fileID: 705507995}
   EjectaSize: 28
 --- !u!114 &963194231
 MonoBehaviour:
@@ -848,6 +851,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66b773f604df5994f992487acee32453, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  smokeDensity: {fileID: 0}
 --- !u!1 &1147710577
 GameObject:
   m_ObjectHideFlags: 0
@@ -864,7 +868,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &1147710578
 Light:
   m_ObjectHideFlags: 0
@@ -957,7 +961,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &1188041262
 Light:
   m_ObjectHideFlags: 0
@@ -1145,7 +1149,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &1432624735
 Light:
   m_ObjectHideFlags: 0
@@ -1238,7 +1242,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &1745610721
 Light:
   m_ObjectHideFlags: 0
@@ -1331,7 +1335,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!108 &1817819955
 Light:
   m_ObjectHideFlags: 0

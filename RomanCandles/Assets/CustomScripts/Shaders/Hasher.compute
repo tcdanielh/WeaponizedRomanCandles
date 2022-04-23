@@ -6,7 +6,8 @@ struct Ejecta {
     float4 color;
 };
 RWStructuredBuffer<Ejecta> Ejectas;
-RWStructuredBuffer<Ejecta> Hash;
+//RWStructuredBuffer<Ejecta> Hash;
+RWTexture3D<float4> hash;
 float4 gridSize;
 float4 gridMin;
 float binLength; //length of each bin in worldspace
@@ -19,6 +20,20 @@ int3 binCoord(float3 pos) {
     return posI;
 }
 
+float3 worldCoord(int3 b) {
+    float3 middle = float3(b + float3(binLength, binLength, binLength));
+    return middle + gridMin.xyz;
+}
+
+float3 colorToCoord(float4 c) {
+    float3 t = float3(c.x * gridSize.x, c.y * gridSize.y, c.z * gridSize.z);
+    return (t + gridMin.xyz);
+}
+float4 coordToColor(float3 p) {
+    float3 t = p - gridMin.xyz;
+    return float4(t.x / gridSize.x, t.y / gridSize.y, t.z / gridSize.z, 1.0);
+}
+
 int bin(float3 pos) {
     int3 coord = binCoord(pos);
     return coord.x + binsPerAxis.x * (coord.y + binsPerAxis.y * coord.z);
@@ -28,11 +43,23 @@ int bin(float3 pos) {
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
     Ejecta e = Ejectas[id.x];
-    int b = bin(e.pos);
-    for (int i = b*binSize; i < (b+1)*binSize; i++) {
-        if (Hash[i].pos.y == 0) {
-            Hash[i] = e;
-            break;
+    int3 b = binCoord(e.pos);
+    //for (int i = b*binSize; i < (b+1)*binSize; i++) {
+    //    if (Hash[i].pos.y == 0) {
+    //        Hash[i] = e;
+    //        break;
+    //    }
+    //}
+    for (int i = b.x - 1; i <= b.x + 1; i++) {
+        for (int j = b.y - 1; j <= b.y + 1; j++) {
+            for (int k = b.z - 1; k <= b.z + 1; k++) {
+                int3 p = int3(i, j, k);
+                if (p.x < 0 || p.y < 0 || p.z < 0 || p.x > gridSize.x || p.y > gridSize.y || p.z > gridSize.z) continue;
+                float3 binCenter = worldCoord(p);
+                if (hash[p].w == 0 || distance(binCenter, e.pos) < distance(colorToCoord(hash[p]), binCenter)) {
+                    hash[p] = coordToColor(e.pos);
+                }
+            }
         }
     }
 }
