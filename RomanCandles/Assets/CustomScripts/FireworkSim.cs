@@ -36,7 +36,7 @@ public class FireworkSim : MonoBehaviour
     public ScreenWriter.Ejecta[] es;
 
     float rocketLauchTime;
-    bool exploded = false;
+    bool exploded;
 
 
     //Debug position spheres
@@ -45,17 +45,19 @@ public class FireworkSim : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        exploded = false;
         dt = Time.fixedDeltaTime;
         rocketLauchTime = Time.time;
-        float m_i = 4f / 3f * Mathf.PI * Mathf.Pow(R_p, 3) * rho_p;  // mass of ejecta [kg]
-        Vector3 F_gi = new Vector3(0f, 0f, m_i * -g);   // weight of ejecta [N]
-        float m_p = N_p * m_i; // total mass of ejecta
-        float A_px = Mathf.PI * Mathf.Pow(R_p, 2);  // cross-sectional area of ejecta
+        m_i = 4f / 3f * Mathf.PI * Mathf.Pow(R_p, 3) * rho_p;  // mass of ejecta [kg]
+        F_gi = new Vector3(0f, 0f, m_i * -g);   // weight of ejecta [N]
+        m_p = N_p * m_i; // total mass of ejecta
+        A_px = Mathf.PI * Mathf.Pow(R_p, 2);  // cross-sectional area of ejecta
 
-        float m_r = m_p + m_e + m_s;   // total rocket mass [kg]
-        Vector3 v_0 = new Vector3(0, 0, Mathf.Sqrt((float)(2f * eta * H_e * m_f / m_r)));    // initial velocity [m/s]
+        m_r = m_p + m_e + m_s;   // total rocket mass [kg]
+        
+        v_0 = new Vector3(0, Mathf.Sqrt((float)(2f * eta * H_e * m_f / m_r)), 0);    // initial velocity [m/s]
 
-        F_gr = new Vector3(0f, 0f, -g * m_r);
+        F_gr = new Vector3(0f, -g * m_r, 0);
 
         //initialize es
         es = new ScreenWriter.Ejecta[N_p];
@@ -80,6 +82,7 @@ public class FireworkSim : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        Debug.Log("mr = " + m_r);
         if (Time.time < rocketLauchTime + t_e)
         {
             Debug.Log("A");
@@ -96,7 +99,8 @@ public class FireworkSim : MonoBehaviour
             Debug.Log("D");
             Descent();
         }
-        Debug.Log(es[0].pos);
+        //Debug.Log("pos = " + es[0].pos);
+        //Debug.Log("v = " + es[0].v);
 
         for (int i = 0; i < spheres.Length; i++)
         {
@@ -109,16 +113,14 @@ public class FireworkSim : MonoBehaviour
         //foreach (Ejecta e in es)
         for (int i = 0; i < es.Length; i++)
         {
-            Debug.Log("!!!!!!!!!!!!!");
-            ScreenWriter.Ejecta e = es[i];
-            Vector3 F_di = 0.5f * Mathf.PI * Mathf.Pow(R_r, 2) * coeff_drag(R_r, rho_a, e.v, v_a, mu_a) *
-                (v_a - e.v).magnitude * (v_a - e.v);
+            Vector3 F_di = 0.5f * Mathf.PI * Mathf.Pow(R_r, 2) * coeff_drag(R_r, rho_a, es[i].v, v_a, mu_a) *
+                (v_a - es[i].v).magnitude * (v_a - es[i].v);
             Vector3 psi_tot = F_di + F_gr;
 
             // perform explicit Euler integration
-            Debug.Log(dt * (m_r * psi_tot));
-            e.v = e.v + dt * (m_r * psi_tot);
-            e.pos = e.pos + dt * e.v;
+
+            es[i].v = es[i].v + (dt / m_r) * psi_tot;
+            es[i].pos += dt * es[i].v;
 
             // TODO: use fixedUpdate method and display objects in scene
             // example: if (timeNow == dt_i + timeStart) => show object in scene
@@ -137,26 +139,34 @@ public class FireworkSim : MonoBehaviour
         float theta_s;  // spherical polar angle RNV
         float phi_s;    // spherical azimuthal angle RNV
         Vector3 n_i = new Vector3(0f, 0f, 0f);  // velocity trajectory
+
+        Debug.Log("pre exp pos = " + es[1].pos);
+        Debug.Log("pre exp v = " + es[1].v);
         for (int i = 0; i < es.Length; i++)
         {
-            ScreenWriter.Ejecta e = es[i];
             eps_1 = Random.value;
             eps_2 = Random.value;
             theta_s = 2f * Mathf.PI * eps_1;
             phi_s = Mathf.Acos(1f - 2f * eps_2);
 
             // set new position from fragmenting blast
-            e.pos.Set(e.pos.x + R_r * Mathf.Cos(theta_s) * Mathf.Sin(phi_s),
-                e.pos.y + R_r * Mathf.Sin(theta_s) * Mathf.Sin(phi_s),
-                e.pos.z + R_r * Mathf.Cos(phi_s));
+            es[i].pos.Set(es[i].pos.x + R_r * Mathf.Cos(theta_s) * Mathf.Sin(phi_s),
+                es[i].pos.y + R_r * Mathf.Sin(theta_s) * Mathf.Sin(phi_s),
+                es[i].pos.z + R_r * Mathf.Cos(phi_s));
+
+            
 
             // trajectory calculation
-            n_i.Set((e.pos.x - blast_origin.x) / (e.pos - blast_origin).magnitude,
-                (e.pos.y - blast_origin.y) / (e.pos - blast_origin).magnitude,
-                (e.pos.z - blast_origin.z) / (e.pos - blast_origin).magnitude);
+            n_i.Set((es[i].pos.x - blast_origin.x) / (es[i].pos - blast_origin).magnitude,
+                (es[i].pos.y - blast_origin.y) / (es[i].pos - blast_origin).magnitude,
+                (es[i].pos.z - blast_origin.z) / (es[i].pos - blast_origin).magnitude);
             // set velocity
-            e.v.Set(e.v.x + deltav * n_i.x, e.v.y + deltav * n_i.y, e.v.z + deltav * n_i.z);
+            es[i].v.Set(es[i].v.x + deltav * n_i.x, es[i].v.y + deltav * n_i.y, es[i].v.z + deltav * n_i.z);
+
+            
         }
+        Debug.Log("post exp pos = " + es[1].pos);
+        Debug.Log("post exp v = " + es[1].v);
     }
 
     void Descent()
@@ -165,22 +175,21 @@ public class FireworkSim : MonoBehaviour
         //foreach (Ejecta e in es)
         for (int i = 0; i < es.Length; i++)
         {
-            ScreenWriter.Ejecta e = es[i];
 
-            if (e.pos.z <= 0f)  // TODO: landing criteria at or below the z=0 plane? Can change
+            if (es[i].pos.z <= 0f)  // TODO: landing criteria at or below the z=0 plane? Can change
             {
-                e.landed = 1;
-                e.pos.Set(e.pos.x, e.pos.y, 0f);
+                es[i].landed = 1;
+                es[i].pos.Set(es[i].pos.x, es[i].pos.y, 0f);
             }
 
             // perform explicit Euler integration on particles in flight
-            if (e.landed != 1)
+            if (es[i].landed != 1)
             {
-                Vector3 F_di = 0.5f * Mathf.PI * Mathf.Pow(R_p, 2) * coeff_drag(R_p, rho_a, e.v, v_a, mu_a) *
-                (v_a - e.v).magnitude * (v_a - e.v);
+                Vector3 F_di = 0.5f * Mathf.PI * Mathf.Pow(R_p, 2) * coeff_drag(R_p, rho_a, es[i].v, v_a, mu_a) *
+                (v_a - es[i].v).magnitude * (v_a - es[i].v);
                 Vector3 psi_tot = F_di + F_gi;
-                e.v.Set((e.v + dt / m_r * psi_tot).x, (e.v + dt / m_r * psi_tot).y, (e.v + dt / m_r * psi_tot).z);
-                e.pos.Set((e.pos + dt * e.v).x, (e.pos + dt * e.v).y, (e.pos + dt * e.v).z);
+                es[i].v.Set((es[i].v + dt / m_r * psi_tot).x, (es[i].v + dt / m_r * psi_tot).y, (es[i].v + dt / m_r * psi_tot).z);
+                es[i].pos.Set((es[i].pos + dt * es[i].v).x, (es[i].pos + dt * es[i].v).y, (es[i].pos + dt * es[i].v).z);
 
                 // TODO: use fixedUpdate method and display objects in scene as time elapses
             }
