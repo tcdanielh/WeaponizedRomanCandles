@@ -108,6 +108,12 @@ public class ScreenWriter : MonoBehaviour
         hash.enableRandomWrite = true;
         hash.Create();
         EjectaHasher.SetTexture(0, "hash", hash);
+        RenderTexture hashC = new RenderTexture(binsPerAxis[0], binsPerAxis[1], 0);
+        hashC.volumeDepth = binsPerAxis[2];
+        hashC.dimension = UnityEngine.Rendering.TextureDimension.Tex3D;
+        hashC.enableRandomWrite = true;
+        hashC.Create();
+        EjectaHasher.SetTexture(0, "hashC", hashC);
 
         EjectaHasher.SetInts("binsPerAxis", binsPerAxis);
         EjectaHasher.SetVector("gridMin", gridMinPoint);
@@ -133,6 +139,7 @@ public class ScreenWriter : MonoBehaviour
         }
 
         material.SetTexture("EHash", hash);
+        material.SetTexture("EHashC", hashC);
         material.SetVector("binsPerAxis", new Vector4(binsPerAxis[0], binsPerAxis[1], binsPerAxis[2], 0));
         material.SetVector("gridMin", gridMinPoint);
         material.SetVector("gridSize", SmokeGridDimensions);
@@ -159,6 +166,7 @@ public class ScreenWriter : MonoBehaviour
         Graphics.Blit(source, destination, material);
 
         hash.Release();
+        hashC.Release();
 
     }
     

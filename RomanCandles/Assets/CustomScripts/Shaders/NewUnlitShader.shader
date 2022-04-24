@@ -61,6 +61,7 @@ Shader "Unlit/NewUnlitShader"
             float lRadius;
 
             Texture3D<float4> EHash;
+            Texture3D<float4> EHashC;
             float4 binsPerAxis;
             float4 gridSize;
             float4 gridMin;
@@ -71,6 +72,11 @@ Shader "Unlit/NewUnlitShader"
             float sunIntensity;
 
             float4 smokeColor;
+
+            struct pointLight {
+                float3 pos;
+                float4 color;
+            };
 
             float2 rayBoxIntersect(float3 bMin, float3 bMax, float3 ro, float3 rd) {
                 //calculate intersects for each axis-alligned slab
@@ -117,7 +123,8 @@ Shader "Unlit/NewUnlitShader"
                 return (t + gridMin.xyz);
             }
 
-            float3 ClosestLight(float3 pos) {
+            pointLight ClosestLight(float3 pos) {
+                pointLight ret;
                 int3 b = binCoord(pos);
                 float4 closest = float4(-1, -1, -1, -1);
                 for (int i = b.x - 2; i <= b.x + 2; i++) {
@@ -128,15 +135,18 @@ Shader "Unlit/NewUnlitShader"
                             if (EHash[p].w == 0) continue;
                             if (closest.w < 0 || distance(colorToCoord(EHash[p]), pos) < distance(closest.xyz, pos)) {
                                 closest = float4(colorToCoord(EHash[p]),0);
+                                ret.color = EHashC[p];
                             }
                         }
                     }
                 }
-                return closest.xyz;
+                ret.pos = closest.xyz;
+                return ret;
             }
 
             float3 zeroLight(float3 ro, float3 rd, float stepSize) {
-                float3 lPos = ClosestLight(ro);
+                pointLight light = ClosestLight(ro);
+                float3 lPos = light.pos;
                 float3 rl = normalize(lPos - ro);
                 float distToLight = length(lPos - ro);
                 float rcos = max(0, dot(rd, rl)) * distToLight;
@@ -153,13 +163,14 @@ Shader "Unlit/NewUnlitShader"
                 float bri = lRadius * lRadius / (distToCenter2);
                 bri = bri - 1;
                 bri = min(bri, 10);
-                return lColor * bri * lIntensity;
+                return light.color *bri* lIntensity;
                 //TODO: make render stop here so point lights are opaque?
             }
 
             //return estimate of how much light reaches a given point
             float3 ejectaMarch(float3 ro) {
-                float3 lPos = ClosestLight(ro);
+                pointLight light = ClosestLight(ro);
+                float3 lPos = light.pos;
                 if (lPos.x < 0) return float3(0, 0, 0);
                 //return float3(0, 1, 1);
                 float3 rd = normalize(lPos - ro);
@@ -176,7 +187,7 @@ Shader "Unlit/NewUnlitShader"
                     t += stepSize;
                 }
                 float transmit = exp(-stepSize * totalDensity);
-                return (lColor * transmit * lIntensity / (distToLight * distToLight));
+                return (light.color * transmit * lIntensity / (distToLight * distToLight));
             }
 
             float3 sunMarch(float3 ro) {

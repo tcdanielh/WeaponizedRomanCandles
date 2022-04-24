@@ -10,6 +10,7 @@ struct Ejecta {
 RWStructuredBuffer<Ejecta> Ejectas;
 //RWStructuredBuffer<Ejecta> Hash;
 RWTexture3D<float4> hash;
+RWTexture3D<float4> hashC;
 float4 gridSize;
 float4 gridMin;
 float binLength; //length of each bin in worldspace
@@ -60,6 +61,7 @@ void CSMain (uint3 id : SV_DispatchThreadID)
                 float3 binCenter = worldCoord(p);
                 if (hash[p].w == 0 || distance(binCenter, e.pos) < distance(colorToCoord(hash[p]), binCenter)) {
                     hash[p] = coordToColor(e.pos);
+                    hashC[p] = e.color;
                 }
             }
         }
