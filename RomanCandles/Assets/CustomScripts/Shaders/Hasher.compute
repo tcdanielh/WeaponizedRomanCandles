@@ -3,7 +3,9 @@
 
 struct Ejecta {
     float3 pos;
+    float3 v;
     float4 color;
+    int landed;
 };
 RWStructuredBuffer<Ejecta> Ejectas;
 //RWStructuredBuffer<Ejecta> Hash;
