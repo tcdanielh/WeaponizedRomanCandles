@@ -23,6 +23,8 @@ Shader "Unlit/NewUnlitShader"
             {
                 float4 vertex : POSITION;
                 float2 uv : TEXCOORD0;
+
+                UNITY_VERTEX_INPUT_INSTANCE_ID //Insert
             };
 
             struct v2f
@@ -30,19 +32,31 @@ Shader "Unlit/NewUnlitShader"
                 float2 uv : TEXCOORD0;
                 UNITY_FOG_COORDS(1)
                 float4 vertex : SV_POSITION;
-            };
 
-            sampler2D _MainTex;
-            sampler2D _CameraDepthTexture;
+                UNITY_VERTEX_OUTPUT_STEREO //Insert
+            };
+            
+
+            //sampler2D _CameraDepthTexture;
             float4 _MainTex_ST;
 
             v2f vert (appdata v)
             {
                 v2f o;
+
+                UNITY_SETUP_INSTANCE_ID(v); //Insert
+                UNITY_INITIALIZE_OUTPUT(v2f, o); //Insert
+                UNITY_INITIALIZE_VERTEX_OUTPUT_STEREO(o); //Insert
+
                 o.vertex = UnityObjectToClipPos(v.vertex);
                 o.uv = TRANSFORM_TEX(v.uv, _MainTex);
                 return o;
             }
+
+            float4x4 _LeftWorldFromView;
+            float4x4 _RightWorldFromView;
+            float4x4 _LeftViewFromScreen;
+            float4x4 _RightViewFromScreen;
 
             float3 BoundsMin;
             float3 BoundsMax;
@@ -72,6 +86,8 @@ Shader "Unlit/NewUnlitShader"
             float sunIntensity;
 
             float4 smokeColor;
+
+            float eyeOffset;
 
             struct pointLight {
                 float3 pos;
@@ -228,17 +244,49 @@ Shader "Unlit/NewUnlitShader"
                 return (b * transmit) + (float4(smokeDiffuse, 0.0) * smokeColor);
             }
 
+            UNITY_DECLARE_SCREENSPACE_TEXTURE(_MainTex); //Insert
+            UNITY_DECLARE_SCREENSPACE_TEXTURE(_CameraDepthTexture);
+
             fixed4 frag(v2f i) : SV_Target
             {
-                float4 col = tex2D(_MainTex, i.uv);
-                float3 ro = _WorldSpaceCameraPos;
-                float3 localD = mul(unity_CameraInvProjection, float4(i.uv * 2 - 1, 0, -1));
-                float3 worldD = mul(unity_CameraToWorld, float4(localD, 0));
-                float3 rd = normalize(worldD);
+                UNITY_SETUP_STEREO_EYE_INDEX_POST_VERTEX(i); //Insert
+
+                float4 col = UNITY_SAMPLE_SCREENSPACE_TEXTURE(_MainTex, i.uv); //Insert
+
+                float d = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, UnityStereoTransformScreenSpaceTex(i.uv));
+
+                float4x4 proj, eyeToWorld;
+                
+                if (unity_StereoEyeIndex == 0)
+                {
+                    proj = _LeftViewFromScreen;
+                    eyeToWorld = _LeftWorldFromView;
+                }
+                else
+                {
+                    proj = _RightViewFromScreen;
+                    eyeToWorld = _RightWorldFromView;
+                }
+
+                float3 ro = mul(eyeToWorld, float4(0, 0, 0, 1));
+
+                //float4 col = tex2D(_MainTex, i.uv);
+                
+                float2 uvClip = i.uv * 2.0 - 1.0;
+                float4 clipPos = float4(uvClip, d, 1.0);
+                float4 viewPos = mul(proj, clipPos); // inverse projection by clip position
+                viewPos /= viewPos.w; // perspective division
+                float3 worldPos = mul(eyeToWorld, viewPos).xyz;
+
+                //float3 localD = mul(proj, float4(i.uv * 2 - 1, 1, 1));
+                //float3 worldD = mul(eyeToWorld, float4(localD, 0));
+                float3 rd = normalize(worldPos);
+
+                //return float4(rd, 0.0);
 
                 float rawDepth = SAMPLE_DEPTH_TEXTURE(_CameraDepthTexture, i.uv);
-                float depth = LinearEyeDepth(rawDepth) * length(worldD);
-
+                float depth = LinearEyeDepth(rawDepth) * length(worldPos);
+                
                 float2 rayBIntersect = rayBoxIntersect(BoundsMin, BoundsMax, ro, rd);
                 bool hit = ((rayBIntersect.y > 0.0) && (rayBIntersect.x < depth));
                 //bool hit = (depth > 20);
