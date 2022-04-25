@@ -19,9 +19,9 @@ public class FireworkSim : MonoBehaviour
 
 
     // options to change burst radius, flight time, accuracy
-    [SerializeField] float m_e = 2.1f; // explosive charge mass [kg]
-    [SerializeField] float m_f = 1f;    // launch charge mass [kg]
-    [SerializeField] float t_e = 3f; // time of explsion [sec]
+    [SerializeField] float m_e = 0.000001f; // explosive charge mass [kg]
+    [SerializeField] float m_f = 0.000000005f;    // launch charge mass [kg]
+    [SerializeField] float t_e = 1f; // time of explsion [sec]
     float dt;  // time step [sec]
 
     float m_i;  // mass of ejecta [kg]
@@ -49,7 +49,7 @@ public class FireworkSim : MonoBehaviour
         dt = Time.fixedDeltaTime;
         rocketLauchTime = Time.time;
         m_i = 4f / 3f * Mathf.PI * Mathf.Pow(R_p, 3) * rho_p;  // mass of ejecta [kg]
-        F_gi = new Vector3(0f, 0f, m_i * -g);   // weight of ejecta [N]
+        
         m_p = N_p * m_i; // total mass of ejecta
         A_px = Mathf.PI * Mathf.Pow(R_p, 2);  // cross-sectional area of ejecta
 
@@ -58,6 +58,8 @@ public class FireworkSim : MonoBehaviour
         v_0 = new Vector3(0, Mathf.Sqrt((float)(2f * eta * H_e * m_f / m_r)), 0);    // initial velocity [m/s]
 
         F_gr = new Vector3(0f, -g * m_r, 0);
+
+        F_gi = new Vector3(0f, m_i * -g, 0f);   // weight of ejecta [N]
 
         //initialize es
         es = new ScreenWriter.Ejecta[N_p];
@@ -152,8 +154,8 @@ public class FireworkSim : MonoBehaviour
 
             // set new position from fragmenting blast
             es[i].pos.Set(es[i].pos.x + R_r * Mathf.Cos(theta_s) * Mathf.Sin(phi_s),
-                es[i].pos.y + R_r * Mathf.Sin(theta_s) * Mathf.Sin(phi_s),
-                es[i].pos.z + R_r * Mathf.Cos(phi_s));          
+                es[i].pos.y + R_r * Mathf.Cos(phi_s),
+                es[i].pos.z + R_r * Mathf.Sin(theta_s) * Mathf.Sin(phi_s));          
 
             // trajectory calculation
             n_i.Set((es[i].pos.x - blast_origin.x) / (es[i].pos - blast_origin).magnitude,
@@ -176,10 +178,10 @@ public class FireworkSim : MonoBehaviour
         for (int i = 0; i < es.Length; i++)
         {
 
-            if (es[i].pos.z <= 0f)  // TODO: landing criteria at or below the z=0 plane? Can change
+            if (es[i].pos.y <= 0f)  // TODO: landing criteria at or below the z=0 plane? Can change
             {
                 es[i].landed = 1;
-                es[i].pos.Set(es[i].pos.x, es[i].pos.y, 0f);
+                es[i].pos.Set(es[i].pos.x, 0f, es[i].pos.z);
             }
 
             // perform explicit Euler integration on particles in flight
