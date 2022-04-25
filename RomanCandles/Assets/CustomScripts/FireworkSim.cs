@@ -8,7 +8,7 @@ public class FireworkSim : MonoBehaviour
     float g = 9.81f;    // gravitational acceleration [m/s]
     float eta = 0.05f;  // explosive efficiency
     float mu_a = 1.8e-5f;   // air viscosity [kg/(m*s)]
-    public int N_p = 10;
+    public int N_p = 10;    // number of particles
     float H_e = 3e6f;   // explosive heat of combustion [J/kg]
     float R_p = 0.005f; // projectile radius
     float R_r = .2f;    // firework radius
@@ -19,9 +19,9 @@ public class FireworkSim : MonoBehaviour
 
 
     // options to change burst radius, flight time, accuracy
-    [SerializeField] float m_e = 5f; // explosive charge mass [kg]
-    [SerializeField] float m_f = 10f;    // launch charge mass [kg]
-    [SerializeField] float t_e = 5f; // time of explsion [sec]
+    [SerializeField] float m_e = 2.1f; // explosive charge mass [kg]
+    [SerializeField] float m_f = 1f;    // launch charge mass [kg]
+    [SerializeField] float t_e = 3f; // time of explsion [sec]
     float dt;  // time step [sec]
 
     float m_i;  // mass of ejecta [kg]
@@ -67,7 +67,7 @@ public class FireworkSim : MonoBehaviour
             e.color = Random.ColorHSV();
             e.color.w = 0f;
             e.v.Set(v_0.x, v_0.y, v_0.z);  // initial velocity at time = 0
-            e.pos.Set(0f, 0.1f, 0f);  // rocket starts at the origin (0, 0, 0)
+            e.pos.Set(0f, 0.1f, 0f);  // rocket starts these coordinates
             es[i] = e;
         }
 
@@ -75,7 +75,8 @@ public class FireworkSim : MonoBehaviour
         for (int i = 0; i < spheres.Length; i++)
         {
             spheres[i] = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            spheres[i].transform.localScale = 0.2f * Vector3.one;
+            float radius = 2f;
+            spheres[i].transform.localScale = radius * Vector3.one;
         }
     }
 
@@ -152,14 +153,13 @@ public class FireworkSim : MonoBehaviour
             // set new position from fragmenting blast
             es[i].pos.Set(es[i].pos.x + R_r * Mathf.Cos(theta_s) * Mathf.Sin(phi_s),
                 es[i].pos.y + R_r * Mathf.Sin(theta_s) * Mathf.Sin(phi_s),
-                es[i].pos.z + R_r * Mathf.Cos(phi_s));
-
-            
+                es[i].pos.z + R_r * Mathf.Cos(phi_s));          
 
             // trajectory calculation
             n_i.Set((es[i].pos.x - blast_origin.x) / (es[i].pos - blast_origin).magnitude,
                 (es[i].pos.y - blast_origin.y) / (es[i].pos - blast_origin).magnitude,
                 (es[i].pos.z - blast_origin.z) / (es[i].pos - blast_origin).magnitude);
+
             // set velocity
             es[i].v.Set(es[i].v.x + deltav * n_i.x, es[i].v.y + deltav * n_i.y, es[i].v.z + deltav * n_i.z);
 
@@ -197,6 +197,7 @@ public class FireworkSim : MonoBehaviour
         }
     }
 
+    /* Returns piecewise coefficient of drag for a sphere */
     private float coeff_drag(float radius, float rho_a, Vector3 v, Vector3 v_a, float mu_a)
     {
         float cd = 1000;
