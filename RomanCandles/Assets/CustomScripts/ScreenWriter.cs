@@ -82,6 +82,7 @@ public class ScreenWriter : MonoBehaviour
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
         //Ejecta Hashing
+        /*
         hashBuffer.SetData(new Ejecta[hashBuffer.count]);
         EjectaHasher.SetInts("binsPerAxis", binsPerAxis);
         EjectaHasher.SetVector("gridMin", gridMinPoint);
@@ -91,7 +92,7 @@ public class ScreenWriter : MonoBehaviour
         EjectaHasher.SetBuffer(0, "Ejectas", ejectaBuffer);
         EjectaHasher.SetBuffer(0, "Hash", hashBuffer);
         EjectaHasher.Dispatch(0, ejectaBuffer.count / 10, 1, 1);
-
+        */
         //Debug Hash
         //Ejecta[] d = new Ejecta[hashBuffer.count];
         //hashBuffer.GetData(d);
@@ -110,8 +111,9 @@ public class ScreenWriter : MonoBehaviour
         material.SetFloat("lRadius", lRadius);
         material.SetVector("BoundsMin", container.position - container.localScale / 2);
         material.SetVector("BoundsMax", container.position + container.localScale / 2);
-        material.SetTexture("Shape", smoke.getPerlinTexture());
+        //material.SetTexture("Shape", smoke.getPerlinTexture());
         //material.SetTexture("Shape", smokeSim.smokeDensity);
+        material.SetTexture("Shape", smokeSim.smokeDensity);
         material.SetInt("numSteps", 20);
         material.SetInt("numStepsLight", 20);
         material.SetVector("lPos", lightPoint.position);
