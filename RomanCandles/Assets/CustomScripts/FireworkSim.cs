@@ -19,9 +19,9 @@ public class FireworkSim : MonoBehaviour
 
 
     // options to change burst radius, flight time, accuracy
-    [SerializeField] float m_e = 0.1f; // explosive charge mass [kg]
-    [SerializeField] float m_f = 1f;    // launch charge mass [kg]
-    [SerializeField] float t_e = 2f; // time of explosion [sec]
+    [SerializeField] float m_e = 1e-30f; // explosive charge mass [kg]
+    [SerializeField] float m_f = 1e-30f;    // launch charge mass [kg]
+    [SerializeField] float t_e = 0f; // time of explosion [sec]
     float dt;  // time step [sec]
 
     float m_i;  // mass of ejecta [kg]
@@ -77,7 +77,7 @@ public class FireworkSim : MonoBehaviour
         for (int i = 0; i < spheres.Length; i++)
         {
             spheres[i] = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            float radius = 2f;
+            float radius = 1f;
             spheres[i].transform.localScale = radius * Vector3.one;
         }
     }
