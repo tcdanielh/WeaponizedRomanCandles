@@ -10,7 +10,7 @@ public class FireworkSim : MonoBehaviour
     float mu_a = 1.8e-5f;   // air viscosity [kg/(m*s)]
     public int N_p = 10;    // number of particles
     float H_e = 3e6f;   // explosive heat of combustion [J/kg]
-    float R_p = 0.005f; // projectile radius
+    float R_p = 0.005f; // particle radius
     float R_r = .2f;    // firework radius
     float rho_a = 1.225f;   // air density [kg/m^3]
     float rho_p = 2000f;    // projectile density [kg/m^3]
@@ -19,9 +19,9 @@ public class FireworkSim : MonoBehaviour
 
 
     // options to change burst radius, flight time, accuracy
-    [SerializeField] float m_e = 0.000001f; // explosive charge mass [kg]
-    [SerializeField] float m_f = 0.000000005f;    // launch charge mass [kg]
-    [SerializeField] float t_e = 1f; // time of explsion [sec]
+    [SerializeField] float m_e = 0.1f; // explosive charge mass [kg]
+    [SerializeField] float m_f = 1f;    // launch charge mass [kg]
+    [SerializeField] float t_e = 2f; // time of explosion [sec]
     float dt;  // time step [sec]
 
     float m_i;  // mass of ejecta [kg]
@@ -57,7 +57,7 @@ public class FireworkSim : MonoBehaviour
         
         v_0 = new Vector3(0, Mathf.Sqrt((float)(2f * eta * H_e * m_f / m_r)), 0);    // initial velocity [m/s]
 
-        F_gr = new Vector3(0f, -g * m_r, 0);
+        F_gr = new Vector3(0f, m_r * -g, 0f);
 
         F_gi = new Vector3(0f, m_i * -g, 0f);   // weight of ejecta [N]
 
@@ -90,7 +90,7 @@ public class FireworkSim : MonoBehaviour
         {
             Debug.Log("A");
             Ascent();
-        } 
+        }
         else if (!exploded)
         {
             Debug.Log("E");
@@ -122,11 +122,8 @@ public class FireworkSim : MonoBehaviour
 
             // perform explicit Euler integration
 
-            es[i].v = es[i].v + (dt / m_r) * psi_tot;
-            es[i].pos += dt * es[i].v;
-
-            // TODO: use fixedUpdate method and display objects in scene
-            // example: if (timeNow == dt_i + timeStart) => show object in scene
+            es[i].v.Set((es[i].v + dt / m_r * psi_tot).x, (es[i].v + dt / m_r * psi_tot).y, (es[i].v + dt / m_r * psi_tot).z);
+            es[i].pos.Set((es[i].pos + dt * es[i].v).x, (es[i].pos + dt * es[i].v).y, (es[i].pos + dt * es[i].v).z);
 
             // TODO: Insert rocket's smoke trail?
         }
@@ -158,9 +155,10 @@ public class FireworkSim : MonoBehaviour
                 es[i].pos.z + R_r * Mathf.Sin(theta_s) * Mathf.Sin(phi_s));          
 
             // trajectory calculation
-            n_i.Set((es[i].pos.x - blast_origin.x) / (es[i].pos - blast_origin).magnitude,
-                (es[i].pos.y - blast_origin.y) / (es[i].pos - blast_origin).magnitude,
-                (es[i].pos.z - blast_origin.z) / (es[i].pos - blast_origin).magnitude);
+            //n_i.Set((es[i].pos.x - blast_origin.x) / (es[i].pos - blast_origin).magnitude,
+            //    (es[i].pos.y - blast_origin.y) / (es[i].pos - blast_origin).magnitude,
+            //    (es[i].pos.z - blast_origin.z) / (es[i].pos - blast_origin).magnitude);
+            n_i = (es[i].pos - blast_origin).normalized;
 
             // set velocity
             es[i].v.Set(es[i].v.x + deltav * n_i.x, es[i].v.y + deltav * n_i.y, es[i].v.z + deltav * n_i.z);
@@ -175,25 +173,32 @@ public class FireworkSim : MonoBehaviour
     {
         /* Particle Descent */
         //foreach (Ejecta e in es)
+        Vector3 F_di = new Vector3(0f, 0f, 0f);
+        Vector3 psi_tot = new Vector3(0f, 0f, 0f);
+        float drag_scalar;
         for (int i = 0; i < es.Length; i++)
         {
 
-            if (es[i].pos.y <= 0f)  // TODO: landing criteria at or below the z=0 plane? Can change
+            if (es[i].pos.y <= 0f)  // TODO: landing criteria at or below the y=0 plane? Can change
             {
                 es[i].landed = 1;
-                es[i].pos.Set(es[i].pos.x, 0f, es[i].pos.z);
+                es[i].pos.Set(es[i].pos.x, 0f, es[i].pos.z);    // correction to y = 0
             }
 
             // perform explicit Euler integration on particles in flight
             if (es[i].landed != 1)
             {
-                Vector3 F_di = 0.5f * Mathf.PI * Mathf.Pow(R_p, 2) * coeff_drag(R_p, rho_a, es[i].v, v_a, mu_a) *
-                (v_a - es[i].v).magnitude * (v_a - es[i].v);
-                Vector3 psi_tot = F_di + F_gi;
-                es[i].v.Set((es[i].v + dt / m_r * psi_tot).x, (es[i].v + dt / m_r * psi_tot).y, (es[i].v + dt / m_r * psi_tot).z);
-                es[i].pos.Set((es[i].pos + dt * es[i].v).x, (es[i].pos + dt * es[i].v).y, (es[i].pos + dt * es[i].v).z);
+                //Vector3 F_di = 0.5f * A_px * coeff_drag(R_p, rho_a, es[i].v, v_a, mu_a) *
+                //(v_a - es[i].v).magnitude * (v_a - es[i].v);
+                drag_scalar = 0.5f * A_px * coeff_drag(R_p, rho_a, es[i].v, v_a, mu_a) * (v_a - es[i].v).magnitude;
+                F_di.Set(drag_scalar * (v_a - es[i].v).x,
+                    drag_scalar * (v_a - es[i].v).y,
+                    drag_scalar * (v_a - es[i].v).z);
+                psi_tot.Set((F_di + F_gi).x, (F_di + F_gi).y, (F_di + F_gi).z);
 
-                // TODO: use fixedUpdate method and display objects in scene as time elapses
+                // perform explicit Euler integration
+                es[i].v.Set((es[i].v + dt / m_i * psi_tot).x, (es[i].v + dt / m_i * psi_tot).y, (es[i].v + dt / m_i * psi_tot).z);
+                es[i].pos.Set((es[i].pos + dt * es[i].v).x, (es[i].pos + dt * es[i].v).y, (es[i].pos + dt * es[i].v).z);
             }
 
         }
@@ -202,8 +207,8 @@ public class FireworkSim : MonoBehaviour
     /* Returns piecewise coefficient of drag for a sphere */
     private float coeff_drag(float radius, float rho_a, Vector3 v, Vector3 v_a, float mu_a)
     {
-        float cd = 1000;
-        float Re = (2f * radius * rho_a * (v - v_a).magnitude) / mu_a;
+        float cd = 1000f;
+        float Re = (2f * radius * rho_a * (v - v_a).magnitude) / mu_a;  // Reynolds number for sphere
         if (Re > 2e6f)
         {
             cd = 0.18f;
