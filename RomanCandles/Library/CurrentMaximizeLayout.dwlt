@@ -21,10 +21,10 @@ MonoBehaviour:
     y: 30
     width: 1920
     height: 947
-  m_MinSize: {x: 679, y: 542}
-  m_MaxSize: {x: 12004, y: 12042}
+  m_MinSize: {x: 677, y: 521}
+  m_MaxSize: {x: 12002, y: 12021}
   vertical: 0
-  controlID: 2450
+  controlID: -1
 --- !u!114 &2
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -135,10 +135,10 @@ MonoBehaviour:
     y: 0
     width: 1372
     height: 947
-  m_MinSize: {x: 403, y: 542}
-  m_MaxSize: {x: 8003, y: 12042}
+  m_MinSize: {x: 402, y: 521}
+  m_MaxSize: {x: 8002, y: 12021}
   vertical: 1
-  controlID: 2393
+  controlID: -1
 --- !u!114 &4
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -160,10 +160,10 @@ MonoBehaviour:
     y: 0
     width: 1372
     height: 668
-  m_MinSize: {x: 403, y: 421}
-  m_MaxSize: {x: 8003, y: 8021}
+  m_MinSize: {x: 402, y: 421}
+  m_MaxSize: {x: 8002, y: 8021}
   vertical: 0
-  controlID: 2394
+  controlID: -1
 --- !u!114 &5
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -268,7 +268,7 @@ MonoBehaviour:
   m_MinSize: {x: 202, y: 421}
   m_MaxSize: {x: 4002, y: 8021}
   vertical: 1
-  controlID: 2395
+  controlID: -1
 --- !u!114 &8
 MonoBehaviour:
   m_ObjectHideFlags: 52
@@ -288,8 +288,8 @@ MonoBehaviour:
     y: 0
     width: 971
     height: 333
-  m_MinSize: {x: 200, y: 200}
-  m_MaxSize: {x: 4000, y: 4000}
+  m_MinSize: {x: 201, y: 221}
+  m_MaxSize: {x: 4001, y: 4021}
   m_ActualView: {fileID: 9}
   m_Panes:
   - {fileID: 9}
@@ -382,7 +382,7 @@ MonoBehaviour:
   m_Rotation:
     m_Target: {x: -0.3553542, y: -0.46315372, z: 0.2098392, w: -0.7843383}
     speed: 2
-    m_Value: {x: -0.35535297, y: -0.4631521, z: 0.20983846, w: -0.7843356}
+    m_Value: {x: 0.3553542, y: 0.46315372, z: -0.2098392, w: 0.78433836}
   m_Size:
     m_Target: 327.23236
     speed: 2
@@ -430,8 +430,8 @@ MonoBehaviour:
     y: 333
     width: 971
     height: 335
-  m_MinSize: {x: 202, y: 221}
-  m_MaxSize: {x: 4002, y: 4021}
+  m_MinSize: {x: 201, y: 221}
+  m_MaxSize: {x: 4001, y: 4021}
   m_ActualView: {fileID: 2}
   m_Panes:
   - {fileID: 2}
@@ -683,8 +683,8 @@ MonoBehaviour:
     m_CachedPref: -160
     m_ControlHash: -371814159
     m_PrefName: Preview_InspectorPreview
-  m_LastInspectedObjectInstanceID: 15732
-  m_LastVerticalScrollValue: 700
+  m_LastInspectedObjectInstanceID: -1
+  m_LastVerticalScrollValue: 0
   m_GlobalObjectId: 
   m_LockTracker:
     m_IsLocked: 0
