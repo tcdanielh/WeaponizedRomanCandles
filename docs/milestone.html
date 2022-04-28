@@ -32,14 +32,170 @@
     </div>
     <br />
     <div class="report-body">
-        <h1 align="middle">Milestone</h1>
-        <h2 align="middle">Daniel He, Nicholas Jennings, Anthony Villegas, Albert Wen</h2>
-        <div class="padded">
-            <p>
-                Not ready yet!
-            </p>
+        <h1 align="middle">Final Project Proposal</h1>
+        <h3 align="middle">Daniel He, Nicholas Jennings, Anthony Villegas, Albert Wen</h3>
+        <h2>Progress Summary</h2>
+        <p>
+            Our project can be divided into three main parts
+            1) the physics-based firework simulation, 2) smoke simulation, 3) and VR rendering and interaction.
+            The three main phases we are tackling in this firework simulation are ascent, explosion, and descent.
+            We are using Unity's compute shaders to simulate the fireworks and smoke, and then rendering that using a
+            custom fragment shader.
+        </p>
+
+        <p>
+            <b>Fireworks:</b> The firework particles are simualated using custom physics code
+            by solving ordinary differential equations via Euler integration. The explosion and fragment
+            settling physics are complete.
+            Each particle (ejecta) is hashed so that they can be used as light sources in the fragment shader.
+            The fragment shader and ejecta hasher are essentially finished, but one thing to note is that the fragment
+            shaders do not work with compute buffers.
+            So instead, we used a 3d texture to mark the closest particle to all points in the scene close enough
+            to be lit by a particle.
+        </p>
+
+        <p>
+            <b>Smoke:</b> We can currently add a sphere of smoke to the screen and diffuse it using our custom compute
+            shaders.
+            Using the Navier Stokes equation for fluid dynamics, we are in the process of implementing advection based
+            on velocity, temperature, and pressure fields;
+            and also bouyant and vorticity force.
+
+            <math xmlns="http://www.w3.org/1998/Math/MathML" display="block">
+                <mfrac>
+                    <mrow>
+                        <mi>&#x2202;</mi>
+                        <mi>u</mi>
+                    </mrow>
+                    <mrow>
+                        <mi>&#x2202;</mi>
+                        <mi>t</mi>
+                    </mrow>
+                </mfrac>
+                <mo>=</mo>
+                <mo>&#x2212;</mo>
+                <mo stretchy="false">(</mo>
+                <mi>u</mi>
+                <mo>&#x22C5;</mo>
+                <mi mathvariant="normal">&#x2207;</mi>
+                <mo stretchy="false">)</mo>
+                <mi>u</mi>
+                <mo>&#x2212;</mo>
+                <mfrac>
+                    <mn>1</mn>
+                    <mi>&#x3C1;</mi>
+                </mfrac>
+                <mi mathvariant="normal">&#x2207;</mi>
+                <mi>p</mi>
+                <mo>+</mo>
+                <mi>f</mi>
+            </math>
+
+            Where <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <mi>u</mi>
+            </math>
+            is velocity, <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <mi>&#x3C1;</mi>
+            </math>
+            is pressure, <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <mi>&#x3C1;</mi>
+            </math>
+            is density, and <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <mi>f</mi>
+            </math>
+            are other external forces.
+        </p>
+        <p>
+            Point light rendering on the smoke has been implemented as well.
+        </p>
+
+        <p>
+            <b>VR:</b> The VR rendering currently works, but it is still being debugged as it requires us to reduce the
+            detail of the smoke to run well.
+        </p>
+
+        <p>
+            Here is an image of our implementation pipeline:
+        </p>
+        <div align="center">
+            <img src="images/pipeline.jpeg" />
         </div>
+
+
+        <h2>Preliminary Results</h2>
+        <p>
+            We have been able to use 50 ejecta so far for the firework simulation physics:
+        </p>
+        <div align="center">
+            <img src="images/Firework_Exploding_50ejecta.gif" width="1000" />
+        </div>
+
+
+        <p>
+            Here is an example of our smoke density and diffusion over time:
+        </p>
+        <div align="center">
+            <img src="images/density_diffusion.gif" width="1000" />
+        </div>
+
+        <p>
+            Smoke and point-light rendering system. We can see how the smoke occludes objects and how it reacts with the
+            ejecta light and directional light:
+        </p>
+        <div align="center">
+            <video width="1000" controls>
+                <source src="images/smoke_light.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+
+        <h2>Progress Relative to Plan</h2>
+        <p>
+            The individual portions of the firework, smoke, and VR rendering parts of the project are very much on
+            schedule;
+            by the end of this week we have planned to have all the individual parts working standalone.
+            There are a few things remaining for us to do.
+        </p>
+
+        <p>
+            <b>Fireworks:</b> The fragment shader and ejecta hasher might need to some changes once we integrate other
+            parts of the project.
+            Adding supersampling rays with Monte Carlo integration will depend on how we interact between the data
+            structures of the fireworks and smoke.
+            Fireworks physics could be optimized via vectorization or compute shaders.
+        </p>
+
+        <p>
+            <b>Smoke:</b> Our smoke and pointlight rendering system are still being implemented, but is nearly complete.
+            While we can add density and diffuse, advection based on temperature, pressure, and velocity still needs to
+            be implemented.
+        </p>
+
+        <p>
+            <b>VR:</b> VR rendering system works.
+            VR interaction has not yet been implemented and has been put on the backburner for now as we ensure that the
+            base system works well.
+        </p>
+
+        <h2>Updated Work Plan</h2>
+        No updates to the work plan are necessary. We are on schedule!
+
+        <h2>Milestone Video</h2>
+        <div align="center">
+            <iframe width="1000" height="560" src="https://www.youtube.com/embed/fbtjxRcjgys"
+                title="YouTube video player" frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen></iframe>
+        </div>
+
+        <h2>Presentation Slides</h2>
+        <a href="https://docs.google.com/presentation/d/1LfXMocn3dvh5kgpoCujyW2CK0bjBXu_S6sO91uKEKx0/edit?usp=sharing">Google
+            Slides</a>
+
+        <br><br><br><br>
     </div>
+
+
 </body>
 
 </html>
