@@ -1,5 +1,6 @@
 // Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel CSMain
+#pragma kernel CSClear
 
 struct Ejecta {
     float3 pos;
@@ -66,4 +67,11 @@ void CSMain (uint3 id : SV_DispatchThreadID)
             }
         }
     }
+}
+
+[numthreads(8, 8, 8)]
+void CSClear(uint3 id : SV_DispatchThreadID)
+{
+    hash[id] = float4(0, 0, 0, 0);
+    hashC[id] = float4(0, 0, 0, 0);
 }

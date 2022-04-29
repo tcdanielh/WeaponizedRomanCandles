@@ -95,6 +95,15 @@ Shader "Unlit/NewUnlitShader"
                 return float2(distToBox, distThroughBox);
             }
 
+            float rand = 0;
+
+            float pseudoRandom(int2 uv, float v) {
+                v *= 100;
+                int2 r = uv + int2(v, v);
+                float2 noise = (frac(sin(dot(r, float2(12.9898, 78.233) * 2.0)) * 43758.5453));
+                return min(1, abs(noise.x + noise.y) * 0.5);
+            }
+
             float sampleDensity(float3 p) {
                 //TODO replace with actuall function
                 //float2 noise = (frac(sin(dot(uv, float2(12.9898, 78.233) * 2.0)) * 43758.5453));
@@ -109,7 +118,7 @@ Shader "Unlit/NewUnlitShader"
                 //float density = max(0, samp.r);
                 //return density;
 
-                return max(0, sin(p.x) + sin(p.y * 0.5) + sin(p.z * 0.1))/3.0;
+                return max(0, sin(p.x) + sin(p.y * 0.5) + sin(p.z))/3.0;
             }
 
             int3 binCoord(float3 pos) {
@@ -208,22 +217,33 @@ Shader "Unlit/NewUnlitShader"
                 return ejectaMarch(ro) + sunMarch(ro);
             }
 
+            float3 bounceRD(int2 uv, float t, float expDensity, float3 forward) {
+                forward *= expDensity;
+                float3 r = float3(pseudoRandom(uv,t), pseudoRandom(uv,(t + 1) * 2), pseudoRandom(uv,(t + 2) * 2));
+                r = normalize(r);
+                r *= (1 - expDensity);
+                return normalize(r + forward);
+            }
+
             //returns color of smoke
-            float4 rayMarch(float3 ro, float3 rd, float maxD, float stepSize, float4 b) {
+            float4 rayMarch(int2 uv, float3 ro, float3 rd, float maxD, float stepSize, float4 b) {
 
                 float t = 0;
                 float transmit = 1;
                 float3 smokeDiffuse = 0;
+                float3 p = ro;
                 while (t < maxD) {
-                    float3 p = ro + (rd * t);
+                    //float3 p = ro + (rd * t);
                     float3 pointLight = lightMarch(p);
                     float pointDensity = sampleDensity(p);
-                    transmit *= exp(-stepSize * pointDensity * smokeLightAbsorb);
+                    float expDen = exp(-stepSize * pointDensity * smokeLightAbsorb);
+                    transmit *= expDen;
                     smokeDiffuse += pointDensity * pointLight * transmit * stepSize;
                     smokeDiffuse += zeroLight(p, rd, stepSize) * transmit;
                     
                     if (transmit < 0.01) break;
                     t += stepSize;
+                    p += rd * stepSize;
                 }
                 return (b * transmit) + (float4(smokeDiffuse, 0.0) * smokeColor);
             }
@@ -243,7 +263,7 @@ Shader "Unlit/NewUnlitShader"
                 bool hit = ((rayBIntersect.y > 0.0) && (rayBIntersect.x < depth));
                 //bool hit = (depth > 20);
                 if (hit) {
-                    col = rayMarch(ro + (rd * rayBIntersect.x), rd, min(depth - rayBIntersect.x, rayBIntersect.y), rayBIntersect.y / numSteps, col);
+                    col = rayMarch(i.uv,ro + (rd * rayBIntersect.x), rd, min(depth - rayBIntersect.x, rayBIntersect.y), rayBIntersect.y / numSteps, col);
                 }
                 return col;
             }

@@ -51,6 +51,8 @@ public class ScreenWriter : MonoBehaviour
 
     public int EjectaSize = (sizeof(float) * 10) + sizeof(int);
 
+    Ejecta[] es = new Ejecta[0];
+
     private SmokeSim smokeSim;
     private FireworkSim fireworkSim;
     private void Start()
@@ -71,18 +73,19 @@ public class ScreenWriter : MonoBehaviour
         smokeBuffer.SetData(smokeData);
 
         // initialize ejecta
-        Ejecta[] es = new Ejecta[10];
-        for (int i = 0; i < es.Length; i++)
-        {
-            Ejecta e = new Ejecta();
-            e.color = Random.ColorHSV();
-            e.color.w = 0f;
-            e.pos = Random.insideUnitSphere * 10;
-            e.pos.y = Mathf.Abs(e.pos.y);
-            es[i] = e;
-        }
-        ejectaBuffer = new ComputeBuffer(es.Length, EjectaSize);
-        ejectaBuffer.SetData(es);
+        //Ejecta[] es = new Ejecta[10];
+        //for (int i = 0; i < es.Length; i++)
+        //{
+        //    Ejecta e = new Ejecta();
+        //    e.color = Random.ColorHSV();
+        //    e.color.w = 0f;
+        //    e.pos = Random.insideUnitSphere * 10;
+        //    e.pos.y = Mathf.Abs(e.pos.y);
+        //    es[i] = e;
+        //}
+        //ejectaBuffer = new ComputeBuffer(es.Length, EjectaSize);
+        //ejectaBuffer.SetData(es);
+        es = GetComponent<FireworkSim>().es;
 
         int s = Mathf.CeilToInt(SmokeGridDimensions.x * SmokeGridDimensions.y * SmokeGridDimensions.z / hashBinSideLength);
         hashBuffer = new ComputeBuffer(s * EjectaPerBin, EjectaSize);
@@ -100,6 +103,13 @@ public class ScreenWriter : MonoBehaviour
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
+        es = GetComponent<FireworkSim>().es;
+        if (es != null)
+        {
+            ejectaBuffer = new ComputeBuffer(es.Length, EjectaSize);
+            ejectaBuffer.SetData(es);
+        }
+        
         //Ejecta Hashing
         //hashBuffer.SetData(new Ejecta[hashBuffer.count]);
         RenderTexture hash = new RenderTexture(binsPerAxis[0], binsPerAxis[1], 0);
@@ -107,13 +117,13 @@ public class ScreenWriter : MonoBehaviour
         hash.dimension = UnityEngine.Rendering.TextureDimension.Tex3D;
         hash.enableRandomWrite = true;
         hash.Create();
-        EjectaHasher.SetTexture(0, "hash", hash);
+        
         RenderTexture hashC = new RenderTexture(binsPerAxis[0], binsPerAxis[1], 0);
         hashC.volumeDepth = binsPerAxis[2];
         hashC.dimension = UnityEngine.Rendering.TextureDimension.Tex3D;
         hashC.enableRandomWrite = true;
         hashC.Create();
-        EjectaHasher.SetTexture(0, "hashC", hashC);
+        
 
         EjectaHasher.SetInts("binsPerAxis", binsPerAxis);
         EjectaHasher.SetVector("gridMin", gridMinPoint);
@@ -122,6 +132,12 @@ public class ScreenWriter : MonoBehaviour
         EjectaHasher.SetInt("binSize", EjectaPerBin);
         EjectaHasher.SetBuffer(0, "Ejectas", ejectaBuffer);
         //EjectaHasher.SetBuffer(0, "Hash", hashBuffer);
+        EjectaHasher.SetTexture(1, "hashC", hashC);
+        EjectaHasher.SetTexture(1, "hash", hash);
+        EjectaHasher.Dispatch(1, hash.width / 8, hash.height / 8, hash.volumeDepth / 8);
+
+        EjectaHasher.SetTexture(0, "hashC", hashC);
+        EjectaHasher.SetTexture(0, "hash", hash);
         EjectaHasher.Dispatch(0, ejectaBuffer.count / 10, 1, 1);
 
         //Debug Hash

@@ -72,6 +72,7 @@
     <None Include="Assets\CustomScripts\Shaders\PerlinNoiseCompute.compute" />
     <None Include="Assets\CustomScripts\Shaders\Default.compute" />
     <None Include="Assets\CustomScripts\Shaders\NewUnlitShader.shader" />
+    <None Include="Assets\CustomScripts\clear.compute" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">

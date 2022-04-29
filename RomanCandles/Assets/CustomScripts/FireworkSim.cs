@@ -105,10 +105,10 @@ public class FireworkSim : MonoBehaviour
         //Debug.Log("pos = " + es[0].pos);
         //Debug.Log("v = " + es[0].v);
 
-        for (int i = 0; i < spheres.Length; i++)
-        {
-            spheres[i].transform.position = es[i].pos;
-        }
+        //for (int i = 0; i < spheres.Length; i++)
+        //{
+        //    spheres[i].transform.position = es[i].pos;
+        //}
     }
 
     void Ascent()
