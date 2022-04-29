@@ -12,3 +12,9 @@ void CSMain (uint3 id : SV_DispatchThreadID)
 
     Result[id.xy] = float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0);
 }
+
+/* Pseudorandom number generator */
+float random(float2 uv)
+{
+    return frac(sin(dot(uv, float2(12.9898, 78.233))) * 43758.5453123);
+}
