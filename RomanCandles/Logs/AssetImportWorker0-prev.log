@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 Using pre-set license
 Built from '2020.3/staging' branch; Version is '2020.3.33f1 (915a7af8b0d5) revision 9525882'; Using compiler version '192528614'; Build Type 'Release'
 OS: 'Windows 10  (10.0.19043) 64bit Core' Language: 'en' Physical Memory: 16329 MB
@@ -5,12 +6,30 @@ BatchMode: 1, IsHumanControllingUs: 0, StartBugReporterOnCrash: 0, Is64bit: 1, I
 
 COMMAND LINE ARGUMENTS:
 E:\UnityVersions\2020.3.33f1\Editor\Unity.exe
+=======
+Unity Editor version:    2020.3.33f1 (915a7af8b0d5)
+Branch:                  2020.3/staging
+Build type:              Release
+Batch mode:              YES
+System name:             Linux
+Distro version:          #121~18.04.1-Ubuntu SMP Thu Mar 24 17:21:33 UTC 2022
+Kernel version:          5.4.0-107-generic
+Architecture:            x86_64
+Available memory:        32054 MB
+Using pre-set license
+Pro License: NO
+Desktop is 1024 x 768 @ 60 Hz
+
+COMMAND LINE ARGUMENTS:
+Unity
+>>>>>>> e92e982c2468b7dc1752d5cc37f6486d7082f87e
 -adb2
 -batchMode
 -noUpm
 -name
 AssetImportWorker0
 -projectPath
+<<<<<<< HEAD
 E:/WeaponizedRomanCandles/RomanCandles
 -logFile
 Logs/AssetImportWorker0.log
@@ -48,11 +67,55 @@ Mono: successfully reloaded assembly
 Domain Reload Profiling:
 	ReloadAssembly (455ms)
 		BeginReloadAssembly (47ms)
+=======
+/home/tmp/cs184-acr/candles/WeaponizedRomanCandles/RomanCandles
+-logFile
+Logs/AssetImportWorker0.log
+-srvPort
+34897
+Successfully changed project path to: /home/tmp/cs184-acr/candles/WeaponizedRomanCandles/RomanCandles
+/home/tmp/cs184-acr/candles/WeaponizedRomanCandles/RomanCandles
+Using Asset Import Pipeline V2.
+Refreshing native plugins compatible for Editor in 60.23 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Initialize engine version: 2020.3.33f1 (915a7af8b0d5)
+[Subsystems] Discovering subsystems at path /home/tmp/cs184-acr/UnityInstalls/2020.3.33f1/Editor/Data/Resources/UnitySubsystems
+[Subsystems] Discovering subsystems at path /home/tmp/cs184-acr/candles/WeaponizedRomanCandles/RomanCandles/Assets
+GLX Extensions: GLX_ARB_context_flush_control GLX_ARB_create_context GLX_ARB_create_context_profile GLX_ARB_fbconfig_float GLX_ARB_framebuffer_sRGB GLX_ARB_get_proc_address GLX_ARB_multisample GLX_EXT_create_context_es2_profile GLX_EXT_create_context_es_profile GLX_EXT_fbconfig_packed_float GLX_EXT_framebuffer_sRGB GLX_EXT_import_context GLX_EXT_texture_from_pixmap GLX_EXT_visual_info GLX_EXT_visual_rating GLX_MESA_copy_sub_buffer GLX_MESA_query_renderer GLX_OML_swap_method GLX_SGIS_multisample GLX_SGIX_fbconfig GLX_SGIX_pbuffer GLX_SGIX_visual_select_group GLX_SGI_make_current_read 
+Renderer: llvmpipe (LLVM 10.0.0, 256 bits)
+Vendor:   VMware, Inc.
+Version:  3.3 (Core Profile) Mesa 20.0.8
+GLES:     0
+ GL_AMD_conservative_depth GL_AMD_draw_buffers_blend GL_AMD_gpu_shader_int64 GL_AMD_multi_draw_indirect GL_AMD_query_buffer_object GL_AMD_seamless_cubemap_per_texture GL_AMD_shader_stencil_export GL_AMD_shader_trinary_minmax GL_AMD_texture_texture4 GL_AMD_vertex_shader_layer GL_AMD_vertex_shader_viewport_index GL_ANGLE_texture_compression_dxt3 GL_ANGLE_texture_compression_dxt5 GL_ARB_ES2_compatibility GL_ARB_ES3_compatibility GL_ARB_arrays_of_arrays GL_ARB_base_instance GL_ARB_blend_func_extended GL_ARB_buffer_storage GL_ARB_clear_buffer_object GL_ARB_clear_texture GL_ARB_clip_control GL_ARB_compressed_texture_pixel_storage GL_ARB_compute_shader GL_ARB_conditional_render_inverted GL_ARB_conservative_depth GL_ARB_copy_buffer GL_ARB_copy_image GL_ARB_cull_distance GL_ARB_debug_output GL_ARB_depth_buffer_float GL_ARB_depth_clamp GL_ARB_derivative_control GL_ARB_direct_state_access GL_ARB_draw_buffers GL_ARB_draw_buffers_blend GL_ARB_draw_elements_base_vertex GL_ARB_draw_indirect GL_ARB_draw_instanced GL_ARB_enh
+anced_layouts GL_ARB_explicit_attrib_location GL_ARB_explicit_uniform_location GL_ARB_fragment_coord_conventions GL_ARB_fragment_layer_viewport GL_ARB_fragment_shader GL_ARB_framebuffer_no_attachments GL_ARB_framebuffer_object GL_ARB_framebuffer_sRGB GL_ARB_get_program_binary GL_ARB_get_texture_sub_image GL_ARB_gpu_shader_fp64 GL_ARB_gpu_shader_int64 GL_ARB_half_float_pixel GL_ARB_half_float_vertex GL_ARB_indirect_parameters GL_ARB_instanced_arrays GL_ARB_internalformat_query GL_ARB_internalformat_query2 GL_ARB_invalidate_subdata GL_ARB_map_buffer_alignment GL_ARB_map_buffer_range GL_ARB_multi_bind GL_ARB_multi_draw_indirect GL_ARB_occlusion_query2 GL_ARB_parallel_shader_compile GL_ARB_pipeline_statistics_query GL_ARB_pixel_buffer_object GL_ARB_point_sprite GL_ARB_polygon_offset_clamp GL_ARB_program_interface_query GL_ARB_provoking_vertex GL_ARB_query_buffer_object GL_ARB_robustness GL_ARB_sampler_objects GL_ARB_seamless_cube_map GL_ARB_seamless_cubemap_per_texture GL_ARB_separate_shader_objects GL_ARB_shade
+r_atomic_counter_ops GL_ARB_shader_atomic_counters GL_ARB_shader_bit_encoding GL_ARB_shader_draw_parameters GL_ARB_shader_group_vote GL_ARB_shader_image_load_store GL_ARB_shader_image_size GL_ARB_shader_objects GL_ARB_shader_stencil_export GL_ARB_shader_storage_buffer_object GL_ARB_shader_subroutine GL_ARB_shader_texture_lod GL_ARB_shading_language_420pack GL_ARB_shading_language_include GL_ARB_shading_language_packing GL_ARB_stencil_texturing GL_ARB_sync GL_ARB_texture_buffer_object GL_ARB_texture_buffer_object_rgb32 GL_ARB_texture_buffer_range GL_ARB_texture_compression_bptc GL_ARB_texture_compression_rgtc GL_ARB_texture_cube_map_array GL_ARB_texture_float GL_ARB_texture_gather GL_ARB_texture_mirror_clamp_to_edge GL_ARB_texture_multisample GL_ARB_texture_non_power_of_two GL_ARB_texture_query_levels GL_ARB_texture_query_lod GL_ARB_texture_rectangle GL_ARB_texture_rg GL_ARB_texture_rgb10_a2ui GL_ARB_texture_stencil8 GL_ARB_texture_storage GL_ARB_texture_storage_multisample GL_ARB_texture_swizzle GL_ARB_textu
+re_view GL_ARB_timer_query GL_ARB_transform_feedback2 GL_ARB_transform_feedback3 GL_ARB_transform_feedback_instanced GL_ARB_transform_feedback_overflow_query GL_ARB_uniform_buffer_object GL_ARB_vertex_array_bgra GL_ARB_vertex_array_object GL_ARB_vertex_attrib_64bit GL_ARB_vertex_attrib_binding GL_ARB_vertex_buffer_object GL_ARB_vertex_shader GL_ARB_vertex_type_10f_11f_11f_rev GL_ARB_vertex_type_2_10_10_10_rev GL_ARB_viewport_array GL_ATI_blend_equation_separate GL_ATI_texture_float GL_ATI_texture_mirror_once GL_EXT_EGL_image_storage GL_EXT_EGL_sync GL_EXT_abgr GL_EXT_blend_equation_separate GL_EXT_draw_buffers2 GL_EXT_draw_instanced GL_EXT_framebuffer_blit GL_EXT_framebuffer_multisample GL_EXT_framebuffer_multisample_blit_scaled GL_EXT_framebuffer_object GL_EXT_framebuffer_sRGB GL_EXT_packed_depth_stencil GL_EXT_packed_float GL_EXT_pixel_buffer_object GL_EXT_polygon_offset_clamp GL_EXT_provoking_vertex GL_EXT_shader_integer_mix GL_EXT_texture_array GL_EXT_texture_compression_dxt1 GL_EXT_texture_compression_r
+gtc GL_EXT_texture_compression_s3tc GL_EXT_texture_integer GL_EXT_texture_mirror_clamp GL_EXT_texture_sRGB GL_EXT_texture_sRGB_R8 GL_EXT_texture_sRGB_decode GL_EXT_texture_shared_exponent GL_EXT_texture_snorm GL_EXT_texture_swizzle GL_EXT_timer_query GL_EXT_transform_feedback GL_EXT_vertex_array_bgra GL_EXT_vertex_attrib_64bit GL_IBM_multimode_draw_arrays GL_KHR_context_flush_control GL_KHR_debug GL_KHR_no_error GL_KHR_parallel_shader_compile GL_KHR_texture_compression_astc_ldr GL_KHR_texture_compression_astc_sliced_3d GL_MESA_pack_invert GL_MESA_shader_integer_functions GL_MESA_texture_signed_rgba GL_MESA_ycbcr_texture GL_NV_conditional_render GL_NV_depth_clamp GL_NV_packed_depth_stencil GL_OES_EGL_image GL_S3_s3tc
+OPENGL LOG: Creating OpenGL 3.3 graphics device ; Context level  <OpenGL 3.3> ; Context handle 197937664
+Initialize mono
+Mono path[0] = '/home/tmp/cs184-acr/UnityInstalls/2020.3.33f1/Editor/Data/Managed'
+Mono path[1] = '/home/tmp/cs184-acr/UnityInstalls/2020.3.33f1/Editor/Data/MonoBleedingEdge/lib/mono/unityjit'
+Mono config path = '/home/tmp/cs184-acr/UnityInstalls/2020.3.33f1/Editor/Data/MonoBleedingEdge/etc'
+Using monoOptions --debugger-agent=transport=dt_socket,embedding=1,server=y,suspend=n,address=127.0.0.1:56990
+Begin MonoManager ReloadAssembly
+Registering precompiled unity dll's ...
+Register platform support module: /home/tmp/cs184-acr/UnityInstalls/2020.3.33f1/Editor/Data/PlaybackEngines/LinuxStandaloneSupport/UnityEditor.LinuxStandalone.Extensions.dll
+Registered in 0.033095 seconds.
+Native extension for LinuxStandalone target not found
+Refreshing native plugins compatible for Editor in 33.57 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Mono: successfully reloaded assembly
+- Completed reload, in  0.944 seconds
+Domain Reload Profiling:
+	ReloadAssembly (944ms)
+		BeginReloadAssembly (267ms)
+>>>>>>> e92e982c2468b7dc1752d5cc37f6486d7082f87e
 			ExecutionOrderSort (0ms)
 			DisableScriptedObjects (0ms)
 			BackupInstance (0ms)
 			ReleaseScriptingObjects (0ms)
 			CreateAndSetChildDomain (1ms)
+<<<<<<< HEAD
 		EndReloadAssembly (352ms)
 			LoadAssemblies (46ms)
 			RebuildTransferFunctionScriptingTraits (0ms)
@@ -67,12 +130,29 @@ Domain Reload Profiling:
 				BeforeProcessingInitializeOnLoad (15ms)
 				ProcessInitializeOnLoadAttributes (63ms)
 				ProcessInitializeOnLoadMethodAttributes (21ms)
+=======
+		EndReloadAssembly (530ms)
+			LoadAssemblies (267ms)
+			RebuildTransferFunctionScriptingTraits (0ms)
+			SetupTypeCache (161ms)
+			ReleaseScriptCaches (0ms)
+			RebuildScriptCaches (32ms)
+			SetupLoadedEditorAssemblies (233ms)
+				LogAssemblyErrors (0ms)
+				InitializePlatformSupportModulesInManaged (7ms)
+				SetLoadedEditorAssemblies (0ms)
+				RefreshPlugins (34ms)
+				BeforeProcessingInitializeOnLoad (9ms)
+				ProcessInitializeOnLoadAttributes (144ms)
+				ProcessInitializeOnLoadMethodAttributes (39ms)
+>>>>>>> e92e982c2468b7dc1752d5cc37f6486d7082f87e
 				AfterProcessingInitializeOnLoad (0ms)
 				EditorAssembliesLoaded (0ms)
 			ExecutionOrderSort2 (0ms)
 			AwakeInstancesAfterBackupRestoration (0ms)
 Platform modules already initialized, skipping
 Registering precompiled user dll's ...
+<<<<<<< HEAD
 Registered in 0.001506 seconds.
 Begin MonoManager ReloadAssembly
 Symbol file LoadedFromMemory doesn't match image E:\WeaponizedRomanCandles\RomanCandles\Library\PackageCache\com.unity.collab-proxy@1.15.15\Lib\Editor\PlasticSCM\unityplastic.dll
@@ -122,6 +202,56 @@ Total: 2.591600 ms (FindLiveObjects: 0.136100 ms CreateObjectMapping: 0.037800 m
 
 AssetImportParameters requested are different than current active one (requested -> active):
   custom:framework-win-MediaFoundation: 216162199b28c13a410421893ffa2e32 -> 
+=======
+Registered in 0.007493 seconds.
+Begin MonoManager ReloadAssembly
+Symbol file LoadedFromMemory doesn't match image /home/tmp/cs184-acr/candles/WeaponizedRomanCandles/RomanCandles/Library/PackageCache/com.unity.collab-proxy@1.15.15/Lib/Editor/PlasticSCM/unityplastic.dll
+Native extension for LinuxStandalone target not found
+Refreshing native plugins compatible for Editor in 0.31 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Mono: successfully reloaded assembly
+- Completed reload, in  1.299 seconds
+Domain Reload Profiling:
+	ReloadAssembly (1301ms)
+		BeginReloadAssembly (262ms)
+			ExecutionOrderSort (0ms)
+			DisableScriptedObjects (5ms)
+			BackupInstance (0ms)
+			ReleaseScriptingObjects (0ms)
+			CreateAndSetChildDomain (20ms)
+		EndReloadAssembly (934ms)
+			LoadAssemblies (251ms)
+			RebuildTransferFunctionScriptingTraits (0ms)
+			SetupTypeCache (274ms)
+			ReleaseScriptCaches (0ms)
+			RebuildScriptCaches (43ms)
+			SetupLoadedEditorAssemblies (383ms)
+				LogAssemblyErrors (0ms)
+				InitializePlatformSupportModulesInManaged (6ms)
+				SetLoadedEditorAssemblies (0ms)
+				RefreshPlugins (0ms)
+				BeforeProcessingInitializeOnLoad (91ms)
+				ProcessInitializeOnLoadAttributes (244ms)
+				ProcessInitializeOnLoadMethodAttributes (9ms)
+				AfterProcessingInitializeOnLoad (32ms)
+				EditorAssembliesLoaded (0ms)
+			ExecutionOrderSort2 (0ms)
+			AwakeInstancesAfterBackupRestoration (11ms)
+Platform modules already initialized, skipping
+========================================================================
+Worker process is ready to serve import requests
+Launched and connected shader compiler UnityShaderCompiler after 0.01 seconds
+Refreshing native plugins compatible for Editor in 0.33 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 1515 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 63.3 MB.
+System memory in use after: 63.4 MB.
+
+Unloading 16 unused Assets to reduce memory usage. Loaded Objects now: 1951.
+Total: 5.138831 ms (FindLiveObjects: 0.172905 ms CreateObjectMapping: 0.062338 ms MarkObjects: 4.755073 ms  DeleteObjects: 0.147514 ms)
+
+AssetImportParameters requested are different than current active one (requested -> active):
+>>>>>>> e92e982c2468b7dc1752d5cc37f6486d7082f87e
   custom:video-decoder-ogg-theora: a1e56fd34408186e4bbccfd4996cb3dc -> 
   custom:container-muxer-webm: aa71ff27fc2769a1b78a27578f13a17b -> 
   custom:container-demuxer-webm: 4f35f7cbe854078d1ac9338744f61a02 -> 
@@ -132,6 +262,7 @@ AssetImportParameters requested are different than current active one (requested
   custom:audio-encoder-webm-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
 ========================================================================
 Received Import Request.
+<<<<<<< HEAD
   path: Assets/CustomScripts/clear.compute
   artifactKey: Guid(fcc5b0b89cf27d24494cf3ce66cbcffd) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
 Start importing Assets/CustomScripts/clear.compute using Guid(fcc5b0b89cf27d24494cf3ce66cbcffd) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '5d85a36da5806c78f0b1f281f219cd5d') in 0.036030 seconds 
@@ -190,6 +321,161 @@ Total: 2.783800 ms (FindLiveObjects: 0.157500 ms CreateObjectMapping: 0.037300 m
 
 AssetImportParameters requested are different than current active one (requested -> active):
   custom:framework-win-MediaFoundation: 216162199b28c13a410421893ffa2e32 -> 
+=======
+  path: Assets/CustomScripts/perlinTest.compute
+  artifactKey: Guid(22174a08acd931b4b98f1213fca660a9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/CustomScripts/perlinTest.compute using Guid(22174a08acd931b4b98f1213fca660a9) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'f79b0bc605f3bc20005a0ba49d39d9f0') in 0.025992 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 0.001804 seconds.
+  path: Assets/CustomScripts/clear.compute
+  artifactKey: Guid(fcc5b0b89cf27d24494cf3ce66cbcffd) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/CustomScripts/clear.compute using Guid(fcc5b0b89cf27d24494cf3ce66cbcffd) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '124185f1317b008465361f8e7aee35a3') in 0.013698 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 21.901254 seconds.
+  path: Assets/CustomScripts/ComputeShaderTest.cs
+  artifactKey: Guid(3e418d1b4a198fc4fb173d2b7824abaf) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/CustomScripts/ComputeShaderTest.cs using Guid(3e418d1b4a198fc4fb173d2b7824abaf) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '60517e54e53443ca44aa0c2e9a190e44') in 0.014760 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 899.346290 seconds.
+  path: Assets/CustomScripts/Shaders/Default.compute
+  artifactKey: Guid(1ae8457bd9a60244e89474543c113ae2) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/CustomScripts/Shaders/Default.compute using Guid(1ae8457bd9a60244e89474543c113ae2) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'deea45c810627c8a2e7aa6c8243dab90') in 0.013875 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 0.001577 seconds.
+  path: Assets/CustomScripts/Shaders/FireworkSim.compute
+  artifactKey: Guid(8e3268b48c32ffc4d83dd846178868bf) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/CustomScripts/Shaders/FireworkSim.compute using Guid(8e3268b48c32ffc4d83dd846178868bf) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'eeadbc13e3dbb6e374b3c59c45d7dc24') in 0.013233 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 0.000784 seconds.
+  path: Assets/CustomScripts/Shaders/Hasher.compute
+  artifactKey: Guid(14fa0603f116c7f4fb032fd5ca94cbff) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/CustomScripts/Shaders/Hasher.compute using Guid(14fa0603f116c7f4fb032fd5ca94cbff) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '47c123d0a0b386bf0b638044b9789b87') in 0.041252 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 0.001839 seconds.
+  path: Assets/CustomScripts/Shaders/NewComputeShader.compute
+  artifactKey: Guid(e23077b50afe118408e5e2f134eac72a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/CustomScripts/Shaders/NewComputeShader.compute using Guid(e23077b50afe118408e5e2f134eac72a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'f8faee60269b1a0b037a363d76d321aa') in 0.033477 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 0.001418 seconds.
+  path: Assets/CustomScripts/Shaders/Slicer.compute
+  artifactKey: Guid(f04f847887d757b41baffa749c311d9d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/CustomScripts/Shaders/Slicer.compute using Guid(f04f847887d757b41baffa749c311d9d) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '163f3328ee5abce26c212dabae6d5637') in 0.010735 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 0.001662 seconds.
+  path: Assets/CustomScripts/Shaders/PerlinNoiseCompute.compute
+  artifactKey: Guid(b67536678e9410e418fecdf0dc73c85a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/CustomScripts/Shaders/PerlinNoiseCompute.compute using Guid(b67536678e9410e418fecdf0dc73c85a) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '78950fc3ab3c70dc7e295075c3d305b2') in 0.036148 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 0.001274 seconds.
+  path: Assets/CustomScripts/Shaders/ZeroBounce.compute
+  artifactKey: Guid(002500f189c08ab4da6d2d4a011e2583) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/CustomScripts/Shaders/ZeroBounce.compute using Guid(002500f189c08ab4da6d2d4a011e2583) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '1cefd784aec61fa8193c7bbf740f31e0') in 0.010479 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 74.183116 seconds.
+  path: Assets/CustomScripts/Shaders/ApplyImpulse.compute
+  artifactKey: Guid(a05d619064a9fb341a4a8187504edde3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/CustomScripts/Shaders/ApplyImpulse.compute using Guid(a05d619064a9fb341a4a8187504edde3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '6007854898301f67d3b82ef04507fe0b') in 0.040573 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 44.341550 seconds.
+  path: Assets/CustomScripts/Shaders/ApplyImpulse.compute
+  artifactKey: Guid(a05d619064a9fb341a4a8187504edde3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/CustomScripts/Shaders/ApplyImpulse.compute using Guid(a05d619064a9fb341a4a8187504edde3) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '13ddfc97626314a84dba481ab1336f25') in 0.028681 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 22.241380 seconds.
+  path: Assets/CustomScripts/Shaders/DiffuseShader.compute
+  artifactKey: Guid(67a24564c260d1bdb89480faebeffdf4) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/CustomScripts/Shaders/DiffuseShader.compute using Guid(67a24564c260d1bdb89480faebeffdf4) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'e40cdd8a6e393fa9e61a73be8c33a81e') in 0.031535 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 13.964501 seconds.
+  path: Assets/CustomScripts/Shaders/DiffuseShader.compute
+  artifactKey: Guid(67a24564c260d1bdb89480faebeffdf4) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/CustomScripts/Shaders/DiffuseShader.compute using Guid(67a24564c260d1bdb89480faebeffdf4) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '417eba4e654c638af535e02fce2ceee6') in 0.043828 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 24.332512 seconds.
+  path: Assets/Scenes/SampleScene.unity
+  artifactKey: Guid(9fc0d4010bbf28b4594072e72b8655ab) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/Scenes/SampleScene.unity using Guid(9fc0d4010bbf28b4594072e72b8655ab) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'a7dbd5e4114a00666f210b8032740ce1') in 0.010340 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 14.254906 seconds.
+  path: Assets/CustomScripts/SmokeSim.cs
+  artifactKey: Guid(66b773f604df5994f992487acee32453) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/CustomScripts/SmokeSim.cs using Guid(66b773f604df5994f992487acee32453) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '6761d0db8d285dbdf4ade494b3158e1c') in 0.010485 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 12.181146 seconds.
+  path: Assets/CustomScripts/ScreenWriter.cs
+  artifactKey: Guid(252cce67e2674824b8cd217ec88a32dd) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/CustomScripts/ScreenWriter.cs using Guid(252cce67e2674824b8cd217ec88a32dd) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'c6441f601b7d6a8c73a1ddf760044293') in 0.011623 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 7.114907 seconds.
+  path: Assets/CustomScripts/SmokeRender.cs
+  artifactKey: Guid(73f22676eb7b19744b5410a52d432556) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/CustomScripts/SmokeRender.cs using Guid(73f22676eb7b19744b5410a52d432556) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'e40eaf3447c0ea9fbb2d42dbd9ec3cac') in 0.012658 seconds 
+========================================================================
+Received Prepare
+Registering precompiled user dll's ...
+Registered in 0.007203 seconds.
+Begin MonoManager ReloadAssembly
+Symbol file LoadedFromMemory doesn't match image /home/tmp/cs184-acr/candles/WeaponizedRomanCandles/RomanCandles/Library/PackageCache/com.unity.collab-proxy@1.15.15/Lib/Editor/PlasticSCM/unityplastic.dll
+Native extension for LinuxStandalone target not found
+Refreshing native plugins compatible for Editor in 0.34 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Mono: successfully reloaded assembly
+- Completed reload, in  1.193 seconds
+Domain Reload Profiling:
+	ReloadAssembly (1194ms)
+		BeginReloadAssembly (233ms)
+			ExecutionOrderSort (0ms)
+			DisableScriptedObjects (9ms)
+			BackupInstance (0ms)
+			ReleaseScriptingObjects (0ms)
+			CreateAndSetChildDomain (42ms)
+		EndReloadAssembly (870ms)
+			LoadAssemblies (212ms)
+			RebuildTransferFunctionScriptingTraits (0ms)
+			SetupTypeCache (267ms)
+			ReleaseScriptCaches (1ms)
+			RebuildScriptCaches (40ms)
+			SetupLoadedEditorAssemblies (360ms)
+				LogAssemblyErrors (0ms)
+				InitializePlatformSupportModulesInManaged (5ms)
+				SetLoadedEditorAssemblies (1ms)
+				RefreshPlugins (0ms)
+				BeforeProcessingInitializeOnLoad (83ms)
+				ProcessInitializeOnLoadAttributes (234ms)
+				ProcessInitializeOnLoadMethodAttributes (9ms)
+				AfterProcessingInitializeOnLoad (27ms)
+				EditorAssembliesLoaded (0ms)
+			ExecutionOrderSort2 (0ms)
+			AwakeInstancesAfterBackupRestoration (7ms)
+Platform modules already initialized, skipping
+Refreshing native plugins compatible for Editor in 0.51 ms, found 0 plugins.
+Preloading 0 native plugins for Editor in 0.00 ms.
+Unloading 1508 Unused Serialized files (Serialized files now loaded: 0)
+System memory in use before: 63.1 MB.
+System memory in use after: 63.2 MB.
+
+Unloading 11 unused Assets to reduce memory usage. Loaded Objects now: 1954.
+Total: 4.785110 ms (FindLiveObjects: 0.196816 ms CreateObjectMapping: 0.099416 ms MarkObjects: 4.441334 ms  DeleteObjects: 0.046342 ms)
+
+AssetImportParameters requested are different than current active one (requested -> active):
+>>>>>>> e92e982c2468b7dc1752d5cc37f6486d7082f87e
   custom:video-decoder-ogg-theora: a1e56fd34408186e4bbccfd4996cb3dc -> 
   custom:container-muxer-webm: aa71ff27fc2769a1b78a27578f13a17b -> 
   custom:container-demuxer-webm: 4f35f7cbe854078d1ac9338744f61a02 -> 
@@ -199,6 +485,7 @@ AssetImportParameters requested are different than current active one (requested
   custom:audio-decoder-ogg-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
   custom:audio-encoder-webm-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
 ========================================================================
+<<<<<<< HEAD
 Received Prepare
 Registering precompiled user dll's ...
 Registered in 0.001455 seconds.
@@ -768,4 +1055,17 @@ AssetImportParameters requested are different than current active one (requested
   custom:video-decoder-webm-vp8: 9c59270c3fd7afecdb556c50c9e8de78 -> 
   custom:audio-decoder-ogg-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
   custom:audio-encoder-webm-vorbis: bf7c407c2cedff20999df2af8eb42d56 -> 
+=======
+Received Import Request.
+  Time since last request: 97.332495 seconds.
+  path: Assets/CustomScripts/SmokeSim.cs
+  artifactKey: Guid(66b773f604df5994f992487acee32453) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/CustomScripts/SmokeSim.cs using Guid(66b773f604df5994f992487acee32453) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: 'c0c21679494473f79d8de9f4fee8143b') in 0.023247 seconds 
+========================================================================
+Received Import Request.
+  Time since last request: 4.844116 seconds.
+  path: Assets/CustomScripts/SmokeSim.cs
+  artifactKey: Guid(66b773f604df5994f992487acee32453) Importer(815301076,1909f56bfc062723c751e8b465ee728b)
+Start importing Assets/CustomScripts/SmokeSim.cs using Guid(66b773f604df5994f992487acee32453) Importer(815301076,1909f56bfc062723c751e8b465ee728b)  -> (artifact id: '19aa07047e1afbba93942fd26ac95160') in 0.027890 seconds 
+>>>>>>> e92e982c2468b7dc1752d5cc37f6486d7082f87e
 AssetImportWorkerClient::OnTransportError - code=2 error=End of file
