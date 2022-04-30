@@ -5,6 +5,8 @@ using UnityEngine;
 
 public class FireworkSim : MonoBehaviour
 {
+    [SerializeField] EjectaHandler ejectaHandler;
+
     /* Physical Parameters */
 
     public Vector3 playerTraj;
@@ -46,9 +48,20 @@ public class FireworkSim : MonoBehaviour
     //Debug position spheres
     GameObject[] spheres;
 
+
+    //Destroy after time
+    [SerializeField] float lifeTime;
+    float birthTime;
+
+    public Color color;
+
+    [SerializeField] bool debug = false;
+
     // Start is called before the first frame update
     void Start()
     {
+        birthTime = Time.time;
+        ejectaHandler.addFirework(this);
         exploded = false;
         dt = Time.fixedDeltaTime;
         rocketLauchTime = Time.time;
@@ -70,20 +83,24 @@ public class FireworkSim : MonoBehaviour
         for (int i = 0; i < es.Length; i++)
         {
             ScreenWriter.Ejecta e = new ScreenWriter.Ejecta();
-            e.color = Random.ColorHSV();
+            e.color = color;
             e.color.w = 0f;
             e.v.Set(v_0 * playerTraj.x, v_0 * playerTraj.y, v_0 * playerTraj.z);  // initial velocity at time = 0
             e.pos.Set(playerOrigin.x, playerOrigin.y, playerOrigin.z);  // rocket starts these coordinates
             es[i] = e;
         }
 
-        spheres = new GameObject[N_p];
-        for (int i = 0; i < spheres.Length; i++)
+        if (debug)
         {
-            spheres[i] = GameObject.CreatePrimitive(PrimitiveType.Sphere);
-            float radius = 1f;
-            spheres[i].transform.localScale = radius * Vector3.one;
+            spheres = new GameObject[N_p];
+            for (int i = 0; i < spheres.Length; i++)
+            {
+                spheres[i] = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+                float radius = 1f;
+                spheres[i].transform.localScale = radius * Vector3.one;
+            }
         }
+        
     }
 
     // Update is called once per frame
@@ -108,12 +125,17 @@ public class FireworkSim : MonoBehaviour
         }
         //Debug.Log("pos = " + es[0].pos);
         //Debug.Log("v = " + es[0].v);
-
-        //for (int i = 0; i < spheres.Length; i++)
-        //{
-        //    spheres[i].transform.position = es[i].pos;
-        //}
+        if (debug)
+        {
+            for (int i = 0; i < spheres.Length; i++)
+            {
+                spheres[i].transform.position = es[i].pos;
+            }
+        }
+        
     }
+
+    
 
     void Ascent()
     {
@@ -234,5 +256,18 @@ public class FireworkSim : MonoBehaviour
             cd = 24f / Re;
         }
         return cd;
+    }
+
+    private void Update()
+    {
+        if (Time.time > birthTime + lifeTime)
+        {
+            Destroy(gameObject);
+        }
+    }
+
+    private void OnDestroy()
+    {
+        ejectaHandler.removeFirework(this);
     }
 }

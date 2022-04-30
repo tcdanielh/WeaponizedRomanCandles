@@ -60,7 +60,9 @@
     <Compile Include="Assets\CustomScripts\ComputeShaderTest.cs" />
     <Compile Include="Assets\CustomScripts\SmokeRender.cs" />
     <Compile Include="Assets\CustomScripts\FireworkSim.cs" />
+    <Compile Include="Assets\CustomScripts\EjectaHandler.cs" />
     <Compile Include="Assets\CustomScripts\SmokeSim.cs" />
+    <Compile Include="Assets\CustomScripts\PCMakeFirework.cs" />
     <Compile Include="Assets\CustomScripts\ScreenWriter.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -73,6 +75,7 @@
     <None Include="Assets\CustomScripts\Shaders\Default.compute" />
     <None Include="Assets\CustomScripts\Shaders\NewUnlitShader.shader" />
     <None Include="Assets\CustomScripts\clear.compute" />
+    <None Include="Assets\CustomScripts\Shaders\FireworkSim.compute" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="UnityEngine">
