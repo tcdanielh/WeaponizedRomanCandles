@@ -44,8 +44,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   ejectaHandler: {fileID: 11400000, guid: 3474f0401f04b8143b0087688a4fcd09, type: 2}
+  playerTraj: {x: 0, y: 1, z: 0}
+  playerOrigin: {x: 0, y: 0, z: 0}
   N_p: 40
   m_e: 0.00002
   m_f: 0.0007
   t_e: 0.75
   lifeTime: 4
+  color: {r: 0, g: 0, b: 0, a: 0}
+  debug: 0
