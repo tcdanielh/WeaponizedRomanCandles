@@ -1,20 +1,260 @@
 // Each #kernel tells which function to compile; you can have many kernels
 #pragma kernel CSMain
+#pragma kernel CSClear
+
+struct Ejecta {
+    float3 pos;
+    float3 v;
+    float4 color;
+    int landed;
+}
 
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
-RWTexture2D<float4> Result;
+public Vector3 playerTraj;
+RWStructuredBuffer<Ejecta> Ejectas;
+//RWStructuredBuffer<Ejecta> Hash;
+RWTexture3D<float4> hash;
+RWTexture3D<float4> hashC;
+float4 gridSize;
+float4 gridMin;
+float binLength; //length of each bin in worldspace
+int binSize; //maximum number of ejecta per bin
+int3 binsPerAxis;
 
-[numthreads(8,8,1)]
-void CSMain (uint3 id : SV_DispatchThreadID)
+int3 binCoord(float3 pos) {
+    float3 relativePos = pos - gridMin.xyz;
+    int3 posI = int3(floor(pos / binLength));
+    return posI;
+}
+
+float3 worldCoord(int3 b) {
+    float3 middle = float3(b + float3(binLength, binLength, binLength));
+    return middle + gridMin.xyz;
+}
+
+float3 colorToCoord(float4 c) {
+    float3 t = float3(c.x * gridSize.x, c.y * gridSize.y, c.z * gridSize.z);
+    return (t + gridMin.xyz);
+}
+float4 coordToColor(float3 p) {
+    float3 t = p - gridMin.xyz;
+    return float4(t.x / gridSize.x, t.y / gridSize.y, t.z / gridSize.z, 1.0);
+}
+
+int bin(float3 pos) {
+    int3 coord = binCoord(pos);
+    return coord.x + binsPerAxis.x * (coord.y + binsPerAxis.y * coord.z);
+}
+
+// Start is called before the first frame update
+void Start()
 {
-    // TODO: insert actual code here!
+    exploded = false;
+    dt = Time.fixedDeltaTime;
+    rocketLauchTime = Time.time;
+    m_i = 4f / 3f * Mathf.PI * Mathf.Pow(R_p, 3) * rho_p;  // mass of ejecta [kg]
 
-    Result[id.xy] = float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0);
+    m_p = N_p * m_i; // total mass of ejecta
+    A_px = Mathf.PI * Mathf.Pow(R_p, 2);  // cross-sectional area of ejecta
+
+    m_r = m_p + m_e + m_s;   // total rocket mass [kg]
+
+    v_0 = new Vector3(0, Mathf.Sqrt((float)(2f * eta * H_e * m_f / m_r)), 0);    // initial velocity [m/s]
+
+    F_gr = new Vector3(0f, m_r * -g, 0f);
+
+    F_gi = new Vector3(0f, m_i * -g, 0f);   // weight of ejecta [N]
+
+    //initialize es
+    es = new ScreenWriter.Ejecta[N_p];
+    for (int i = 0; i < es.Length; i++)
+    {
+        ScreenWriter.Ejecta e = new ScreenWriter.Ejecta();
+        e.color = Random.ColorHSV();
+        e.color.w = 0f;
+        e.v.Set(v_0.x, v_0.y, v_0.z);  // initial velocity at time = 0
+        e.pos.Set(0f, 0.1f, 0f);  // rocket starts these coordinates
+        es[i] = e;
+    }
+
+    spheres = new GameObject[N_p];
+    for (int i = 0; i < spheres.Length; i++)
+    {
+        spheres[i] = GameObject.CreatePrimitive(PrimitiveType.Sphere);
+        float radius = 1f;
+        spheres[i].transform.localScale = radius * Vector3.one;
+    }
+}
+
+// Update is called once per frame
+void FixedUpdate()
+{
+    Debug.Log("mr = " + m_r);
+    if (Time.time < rocketLauchTime + t_e)
+    {
+        Debug.Log("A");
+        Ascent();
+    }
+    else if (!exploded)
+    {
+        Debug.Log("E");
+        exploded = true;
+        Explosion();
+    }
+    else
+    {
+        Debug.Log("D");
+        Descent();
+    }
+    //Debug.Log("pos = " + es[0].pos);
+    //Debug.Log("v = " + es[0].v);
+
+    //for (int i = 0; i < spheres.Length; i++)
+    //{
+    //    spheres[i].transform.position = es[i].pos;
+    //}
+}
+
+void Ascent()
+{
+    //foreach (Ejecta e in es)
+    for (int i = 0; i < es.Length; i++)
+    {
+        Vector3 F_di = 0.5f * Mathf.PI * Mathf.Pow(R_r, 2) * coeff_drag(R_r, rho_a, es[i].v, v_a, mu_a) *
+            (v_a - es[i].v).magnitude * (v_a - es[i].v);
+        Vector3 psi_tot = F_di + F_gr;
+
+        // perform explicit Euler integration
+
+        es[i].v.Set((es[i].v + dt / m_r * psi_tot).x, (es[i].v + dt / m_r * psi_tot).y, (es[i].v + dt / m_r * psi_tot).z);
+        es[i].pos.Set((es[i].pos + dt * es[i].v).x, (es[i].pos + dt * es[i].v).y, (es[i].pos + dt * es[i].v).z);
+
+        // TODO: Insert rocket's smoke trail?
+    }
+}
+
+void Explosion()
+{
+    /* EXPLOSION!!! */
+    Vector3 blast_origin = es[0].pos;   // place puff of smoke here
+    float deltav = Mathf.Sqrt((float)(2 * eta * H_e * m_e / m_p));   // change in speed after detonation
+    float eps_1;
+    float eps_2;
+    float theta_s;  // spherical polar angle RNV
+    float phi_s;    // spherical azimuthal angle RNV
+    Vector3 n_i = new Vector3(0f, 0f, 0f);  // velocity trajectory
+
+    Debug.Log("pre exp pos = " + es[1].pos);
+    Debug.Log("pre exp v = " + es[1].v);
+    for (int i = 0; i < es.Length; i++)
+    {
+        eps_1 = Random.value;
+        eps_2 = Random.value;
+        theta_s = 2f * Mathf.PI * eps_1;
+        phi_s = Mathf.Acos(1f - 2f * eps_2);
+
+        // set new position from fragmenting blast
+        es[i].pos.Set(es[i].pos.x + R_r * Mathf.Cos(theta_s) * Mathf.Sin(phi_s),
+            es[i].pos.y + R_r * Mathf.Cos(phi_s),
+            es[i].pos.z + R_r * Mathf.Sin(theta_s) * Mathf.Sin(phi_s));
+
+        // trajectory calculation
+        //n_i.Set((es[i].pos.x - blast_origin.x) / (es[i].pos - blast_origin).magnitude,
+        //    (es[i].pos.y - blast_origin.y) / (es[i].pos - blast_origin).magnitude,
+        //    (es[i].pos.z - blast_origin.z) / (es[i].pos - blast_origin).magnitude);
+        n_i = (es[i].pos - blast_origin).normalized;
+
+        // set velocity
+        es[i].v.Set(es[i].v.x + deltav * n_i.x, es[i].v.y + deltav * n_i.y, es[i].v.z + deltav * n_i.z);
+
+
+    }
+    Debug.Log("post exp pos = " + es[1].pos);
+    Debug.Log("post exp v = " + es[1].v);
+}
+
+void Descent()
+{
+    /* Particle Descent */
+    //foreach (Ejecta e in es)
+    Vector3 F_di = new Vector3(0f, 0f, 0f);
+    Vector3 psi_tot = new Vector3(0f, 0f, 0f);
+    float drag_scalar;
+    for (int i = 0; i < es.Length; i++)
+    {
+
+        if (es[i].pos.y <= 0f)  // TODO: landing criteria at or below the y=0 plane? Can change
+        {
+            es[i].landed = 1;
+            es[i].pos.Set(es[i].pos.x, 0f, es[i].pos.z);    // correction to y = 0
+        }
+
+        // perform explicit Euler integration on particles in flight
+        if (es[i].landed != 1)
+        {
+            //Vector3 F_di = 0.5f * A_px * coeff_drag(R_p, rho_a, es[i].v, v_a, mu_a) *
+            //(v_a - es[i].v).magnitude * (v_a - es[i].v);
+            drag_scalar = 0.5f * A_px * coeff_drag(R_p, rho_a, es[i].v, v_a, mu_a) * (v_a - es[i].v).magnitude;
+            F_di.Set(drag_scalar * (v_a - es[i].v).x,
+                drag_scalar * (v_a - es[i].v).y,
+                drag_scalar * (v_a - es[i].v).z);
+            psi_tot.Set((F_di + F_gi).x, (F_di + F_gi).y, (F_di + F_gi).z);
+
+            // perform explicit Euler integration
+            es[i].v.Set((es[i].v + dt / m_i * psi_tot).x, (es[i].v + dt / m_i * psi_tot).y, (es[i].v + dt / m_i * psi_tot).z);
+            es[i].pos.Set((es[i].pos + dt * es[i].v).x, (es[i].pos + dt * es[i].v).y, (es[i].pos + dt * es[i].v).z);
+        }
+
+    }
+}
+
+/* Returns piecewise coefficient of drag for a sphere */
+private float coeff_drag(float radius, float rho_a, float3 v, float3 v_a, float mu_a)
+{
+    float cd = 1000f;
+    float Re = (2f * radius * rho_a * length(operator- (v, v_a))) / mu_a;  // Reynolds number for sphere
+    if (Re > 2e6f)
+    {
+        cd = 0.18f;
+    }
+    else if (Re <= 2e6f && Re > 3e5f)
+    {
+        cd = 3.66e-4f * Mathf.Pow(Re, 0.4275f);
+    }
+    else if (Re <= 3e5f & Re > 400f)
+    {
+        cd = 0.5f;
+    }
+    else if (Re <= 400f && Re > 1f)
+    {
+        cd = 24f * Mathf.Pow(Re, -.646f);
+    }
+    else if (Re <= 1f)
+    {
+        cd = 24f / Re;
+    }
+    return cd;
 }
 
 /* Pseudorandom number generator */
 float random(float2 uv)
 {
     return frac(sin(dot(uv, float2(12.9898, 78.233))) * 43758.5453123);
+}
+
+[numthreads(10, 1, 1)]
+void CSMain (uint3 id : SV_DispatchThreadID)
+{
+    // TODO: insert actual code here!
+    Ejecta e = Ejectas[id.x];
+    Ejecta[id.xy] = float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0);
+}
+
+
+[numthreads(8, 8, 8)]
+void CSClear(uint3 id : SV_DispatchThreadID)
+{
+    hash[id] = float4(0, 0, 0, 0);
+    hashC[id] = float4(0, 0, 0, 0);
 }
