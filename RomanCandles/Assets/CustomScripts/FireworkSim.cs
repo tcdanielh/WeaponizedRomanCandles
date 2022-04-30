@@ -2,9 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+
 public class FireworkSim : MonoBehaviour
 {
     /* Physical Parameters */
+
+    public Vector3 playerTraj;
+    public Vector3 playerOrigin;
     float g = 9.81f;    // gravitational acceleration [m/s]
     float eta = 0.05f;  // explosive efficiency
     float mu_a = 1.8e-5f;   // air viscosity [kg/(m*s)]
@@ -30,7 +34,7 @@ public class FireworkSim : MonoBehaviour
     float A_px;  // cross-sectional area of ejecta
 
     float m_r;   // total rocket mass [kg]
-    Vector3 v_0;// initial velocity [m/s]
+    float v_0;// initial speed [m/s]
     Vector3 F_gr;
 
     public ScreenWriter.Ejecta[] es;
@@ -54,8 +58,8 @@ public class FireworkSim : MonoBehaviour
         A_px = Mathf.PI * Mathf.Pow(R_p, 2);  // cross-sectional area of ejecta
 
         m_r = m_p + m_e + m_s;   // total rocket mass [kg]
-        
-        v_0 = new Vector3(0, Mathf.Sqrt((float)(2f * eta * H_e * m_f / m_r)), 0);    // initial velocity [m/s]
+
+        v_0 = Mathf.Sqrt((float)(2f * eta * H_e * m_f / m_r));
 
         F_gr = new Vector3(0f, m_r * -g, 0f);
 
@@ -68,8 +72,8 @@ public class FireworkSim : MonoBehaviour
             ScreenWriter.Ejecta e = new ScreenWriter.Ejecta();
             e.color = Random.ColorHSV();
             e.color.w = 0f;
-            e.v.Set(v_0.x, v_0.y, v_0.z);  // initial velocity at time = 0
-            e.pos.Set(0f, 0.1f, 0f);  // rocket starts these coordinates
+            e.v.Set(v_0 * playerTraj.x, v_0 * playerTraj.y, v_0 * playerTraj.z);  // initial velocity at time = 0
+            e.pos.Set(playerOrigin.x, playerOrigin.y, playerOrigin.z);  // rocket starts these coordinates
             es[i] = e;
         }
 
