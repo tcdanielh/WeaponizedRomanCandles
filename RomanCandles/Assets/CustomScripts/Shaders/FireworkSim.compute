@@ -11,9 +11,8 @@ struct Ejecta {
 
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
-public Vector3 playerTraj;
+
 RWStructuredBuffer<Ejecta> Ejectas;
-//RWStructuredBuffer<Ejecta> Hash;
 RWTexture3D<float4> hash;
 RWTexture3D<float4> hashC;
 float4 gridSize;
@@ -245,9 +244,49 @@ float random(float2 uv)
 
 [numthreads(10, 1, 1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
-{
-    // TODO: insert actual code here!
+{   
+    /* Physical Parameters */
+    public float3 playerTraj;
+    public float3 playerOrigin;
+    float g = 9.81f;    // gravitational acceleration [m/s]
+    float eta = 0.05f;  // explosive efficiency
+    float mu_a = 1.8e-5f;   // air viscosity [kg/(m*s)]
+    public int N_p = 10;    // number of particles
+    float H_e = 3e6f;   // explosive heat of combustion [J/kg]
+    float R_p = 0.005f; // particle radius
+    float R_r = .2f;    // firework radius
+    float rho_a = 1.225f;   // air density [kg/m^3]
+    float rho_p = 2000f;    // projectile density [kg/m^3]
+    float3 v_a = zero();  // air velocity [m/s]
+    float m_s = 2f; // inert structural mass [kg]
+
+
+    // options to change burst radius, flight time, accuracy
+    [SerializeField] float m_e = 1e-30f; // explosive charge mass [kg]
+    [SerializeField] float m_f = 1e-30f;    // launch charge mass [kg]
+    [SerializeField] float t_e = 0f; // time of explosion [sec]
+    float dt;  // time step [sec]
+
+    float m_i;  // mass of ejecta [kg]
+    Vector3 F_gi;   // weight of ejecta [N]
+    float m_p; // total mass of ejecta
+    float A_px;  // cross-sectional area of ejecta
+
+    float m_r;   // total rocket mass [kg]
+    float v_0;// initial speed [m/s]
+    Vector3 F_gr;
+
+    public ScreenWriter.Ejecta[] es;
+
+    float rocketLauchTime;
+    bool exploded;
+
+
+    //Debug position spheres
+    GameObject[] spheres;
+
     Ejecta e = Ejectas[id.x];
+    int3 b = binCoord(e.pos);
     Ejecta[id.xy] = float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0);
 }
 
