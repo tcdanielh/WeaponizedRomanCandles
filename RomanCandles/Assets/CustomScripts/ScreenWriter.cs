@@ -4,6 +4,8 @@ using UnityEngine;
 
 public class ScreenWriter : MonoBehaviour
 {
+    [SerializeField] EjectaHandler ejectaHandler;
+
     public Color smokeColor;
     public float SmokeCellSideLength;
     public Vector3 SmokeGridDimensions;
@@ -85,7 +87,6 @@ public class ScreenWriter : MonoBehaviour
         //}
         //ejectaBuffer = new ComputeBuffer(es.Length, EjectaSize);
         //ejectaBuffer.SetData(es);
-        es = GetComponent<FireworkSim>().es;
 
         int s = Mathf.CeilToInt(SmokeGridDimensions.x * SmokeGridDimensions.y * SmokeGridDimensions.z / hashBinSideLength);
         hashBuffer = new ComputeBuffer(s * EjectaPerBin, EjectaSize);
@@ -96,6 +97,7 @@ public class ScreenWriter : MonoBehaviour
 
     private void Update()
     {
+        Debug.Log("there are currently " + ejectaHandler.getEjectas().Length + " ejecta in the scene");
         sunColor = sun.GetComponent<Light>().color;
         sunDir = -sun.forward;
         sunIntensity = sun.GetComponent<Light>().intensity;
@@ -103,8 +105,9 @@ public class ScreenWriter : MonoBehaviour
 
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
-        es = GetComponent<FireworkSim>().es;
-        if (es != null)
+       // es = GetComponent<FireworkSim>().es;
+        es = ejectaHandler.getEjectas();
+        if (es != null && es.Length > 0)
         {
             ejectaBuffer = new ComputeBuffer(es.Length, EjectaSize);
             ejectaBuffer.SetData(es);

@@ -47,6 +47,7 @@ int bin(float3 pos) {
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
     Ejecta e = Ejectas[id.x];
+    if (e.pos.y < 0.1) return;
     int3 b = binCoord(e.pos);
     //for (int i = b*binSize; i < (b+1)*binSize; i++) {
     //    if (Hash[i].pos.y == 0) {
