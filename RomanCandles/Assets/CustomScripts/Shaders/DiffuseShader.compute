@@ -1,0 +1,18 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel Diffuse
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+Texture3D<float4> Prev;
+RWTexture3D<float4> Result;
+
+[numthreads(8,8,8)]
+void Diffuse (uint3 id : SV_DispatchThreadID)
+{
+    // TODO: insert actual code here!
+
+
+    //Result[id.xyz] = float4(id.x & id.y, (id.x & 15)/15.0, (id.y & 15)/15.0, 0.0);
+    Result[id.xyz] = (Prev[id.xyz + uint3(-1, 0, 0)] + Prev[id.xyz + uint3(0, -1, 0)]
+    + Prev[id.xyz + uint3(0, 0 ,-1)]) / 3 ; 
+}
