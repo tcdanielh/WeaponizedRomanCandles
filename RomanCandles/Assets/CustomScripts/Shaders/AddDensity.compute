@@ -1,0 +1,29 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel AddDensity
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+Texture3D<float4> Prev;
+RWTexture3D<float4> Result;
+
+float4 position, size;
+
+float time, radius;
+
+[numthreads(8,8,8)]
+void AddDensity (uint3 id : SV_DispatchThreadID)
+{
+    // TODO: insert actual code here!
+    float3 direction = id.xyz - position.xyz;
+    //float3 direction = id/(size.xyz -1.0f) - position.xyz;
+
+    float magnitude = direction.x*direction.x + direction.y*direction.y + direction.z*direction.z;
+    
+    
+    if (magnitude < radius) {
+        //modify this to add impulse to previous values
+        Result[id.xyz] = float4(100.0, 0.0, 0.0, 0.0);
+    } else {
+        Result[id.xyz] = float4(0.0, 0.0, 0.0, 0.0);
+    }
+}

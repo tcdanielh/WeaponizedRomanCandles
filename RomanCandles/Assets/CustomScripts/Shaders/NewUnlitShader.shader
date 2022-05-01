@@ -113,12 +113,12 @@ Shader "Unlit/NewUnlitShader"
                 //float4 samp = Shape.SampleLevel(samplerShape, p,0);
                 //return samp.x;
 
-                //uint3 pos = uint3(uint(floor(p.x * 30)) % 256, uint(floor(p.y * 30)) % 256, uint(floor(p.z * 30)) % 256);
-                //float4 samp = Shape[pos];
-                //float density = max(0, samp.r);
-                //return density;
+                uint3 pos = uint3(uint(floor(p.x * 30)) % 256, uint(floor(p.y * 30)) % 256, uint(floor(p.z * 30)) % 256);
+                float4 samp = Shape[pos];
+                float density = max(0, samp.r);
+                return density;
 
-                return max(0, sin(p.x) + sin(p.y * 0.5) + sin(p.z))/3.0;
+                //return max(0, sin(p.x) + sin(p.y * 0.5) + sin(p.z))/3.0;
             }
 
             int3 binCoord(float3 pos) {
