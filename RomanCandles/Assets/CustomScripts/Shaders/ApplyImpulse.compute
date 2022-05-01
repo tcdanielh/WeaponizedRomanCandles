@@ -15,7 +15,7 @@ float time, radius, power, force, dt;
 [numthreads(8,8,8)]
 void AddDensity (uint3 id : SV_DispatchThreadID)
 {
-    // TODO: insert actual code here!
+  // TODO: insert actual code here!
     //float3 pos = id.xyz - position.xyz;
     float3 pos = id/(size.xyz-1.0f) - position.xyz;
 	float magnitude = pos.x*pos.x + pos.y*pos.y + pos.z*pos.z;
@@ -36,11 +36,12 @@ void AddDensity (uint3 id : SV_DispatchThreadID)
     Result[id.xyz] = Prev[id.xyz] + float4(quantity, 0.0, 0.0, 0.0);///quantity;
 
 }
-/*
+
 #pragma kernel ApplyForce
 [numthreads(8,8,8)]
 void ApplyForce (uint3 id : SV_DispatchThreadID)
 {
     float3 c = force * dt * exp(pow(id/(size.xyz-1.0f) - position.xyz, 2.0f) / radius);
-    //Result[id.xyz] = Prev[id.xyz] + float4(c, 0);
-}*/
+    Result[id.xyz] = Prev[id.xyz] + float4(c, 0.0);
+}
+
