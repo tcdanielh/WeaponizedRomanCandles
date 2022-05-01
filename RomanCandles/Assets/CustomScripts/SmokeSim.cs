@@ -7,6 +7,7 @@ public class SmokeSim : MonoBehaviour
     public RenderTexture[] smokeDensity;
     public RenderTexture[] velocity;
     public ComputeShader impulseShader;
+    public ComputeShader advectShader;
     public static int READ = 0;
     public static int WRITE = 1;
     public Vector4 textureSize;
@@ -20,9 +21,12 @@ public class SmokeSim : MonoBehaviour
     //other buffer variables go here
     // Start is called before the first frame update
 
+    public float StepTime = 0.2f;
+    float lastUpdate = 0.0f;
+
     void Start()
     {
-        size = 256;
+        size = 512;
         textureSize = new Vector4(size, size, size, 0.0f);
 
         smokeDensity = new RenderTexture[2];
@@ -45,8 +49,13 @@ public class SmokeSim : MonoBehaviour
         }
         //time = 0.0f;
         impulsePosition = new Vector4(9.0f, 9.0f, 13.0f, 0.0f);
-        impulseRadius = 6.0f;
-        impulsePower = 40.0f;
+        impulseRadius = 7.0f;//6.0f;
+        impulsePower = 20.0f;//40.0f;
+        for (int i = 0; i < 10; i += 1) {
+            AddDensity(impulsePosition, textureSize, impulseRadius, impulsePower);
+            ApplyForce(impulsePosition, textureSize, impulseRadius, impulsePower, .1f);
+        }
+       
         
          
     }
@@ -56,8 +65,16 @@ public class SmokeSim : MonoBehaviour
         //Un/comment these to show smoke           
         //float impulseRadius = 90.0f; //debug vals and call
         //Vector4 impulsePosition = new Vector4(0.0f, 9.0f, 13.0f, 0.0f);
-        AddDensity(impulsePosition, textureSize, impulseRadius, impulsePower);
-       
+        //AddDensity(impulsePosition, textureSize, impulseRadius, impulsePower);
+        //ApplyForce(impulsePosition, textureSize, impulseRadius, impulsePower, .1f);
+        float dissipation = 0.95f;
+        float dt = Time.deltaTime;
+        if(lastUpdate > StepTime) {
+            AdvectDensity(textureSize, dissipation, dt);
+            lastUpdate = 0.0f;
+        }
+        lastUpdate += Time.deltaTime;
+        
         
 
     }
@@ -85,6 +102,18 @@ public class SmokeSim : MonoBehaviour
         impulseShader.SetVector("size", textureSize);
         impulseShader.Dispatch(kernelHandle, (int) size / 8, (int) size / 8, (int) size / 8);
         Switch(velocity);
+    }
+
+    public void AdvectDensity(Vector4 textureSize, float dissipation, float dt) {
+        int kernelHandle = advectShader.FindKernel("AdvectDensity");
+        advectShader.SetTexture(kernelHandle, "Prev", smokeDensity[READ]);
+        advectShader.SetTexture(kernelHandle, "Result", smokeDensity[WRITE]);
+        advectShader.SetTexture(kernelHandle, "Velocity", velocity[READ]);
+        advectShader.SetVector("size", textureSize);
+        advectShader.SetFloat("dt", dt);
+        advectShader.SetFloat("dissipation", dissipation);
+        advectShader.Dispatch(kernelHandle, (int) size / 8, (int) size / 8, (int) size / 8);
+        Switch(smokeDensity);
     }
 
     void Switch(RenderTexture[] textures) {

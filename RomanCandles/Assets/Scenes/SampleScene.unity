@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 705507994}
-  m_IndirectSpecularColor: {r: 0.44657898, g: 0.4964133, b: 0.5748178, a: 1}
+  m_IndirectSpecularColor: {r: 0.44657826, g: 0.49641263, b: 0.57481676, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -853,7 +853,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 66b773f604df5994f992487acee32453, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  smokeDensity: {fileID: 0}
+  smokeDensity:
+  - {fileID: 0}
+  velocity: []
+  impulseShader: {fileID: 7200000, guid: 481949076cfaa084cad0582a3eddd130, type: 3}
+  advectShader: {fileID: 7200000, guid: da4b20a8c71e8104abdec61cbf7f4923, type: 3}
+  textureSize: {x: 0, y: 0, z: 0, w: 0}
+  size: 0
+  impulseRadius: 0
+  impulsePosition: {x: 0, y: 0, z: 0, w: 0}
+  impulsePower: 0
 --- !u!1 &1147710577
 GameObject:
   m_ObjectHideFlags: 0

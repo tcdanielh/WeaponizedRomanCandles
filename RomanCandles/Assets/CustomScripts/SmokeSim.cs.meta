@@ -4,10 +4,8 @@ MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
-  - smokeDensity: {instanceID: 0}
-  - smokeDensityWrite: {instanceID: 0}
   - impulseShader: {fileID: 7200000, guid: 481949076cfaa084cad0582a3eddd130, type: 3}
-  - diffuseShader: {instanceID: 0}
+  - advectShader: {fileID: 7200000, guid: da4b20a8c71e8104abdec61cbf7f4923, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
