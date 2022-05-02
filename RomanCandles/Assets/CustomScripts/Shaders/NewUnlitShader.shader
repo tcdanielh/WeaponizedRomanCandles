@@ -123,7 +123,7 @@ Shader "Unlit/NewUnlitShader"
 
             int3 binCoord(float3 pos) {
                 float3 relativePos = pos - gridMin.xyz;
-                int3 posI = int3(floor(pos / binLength));
+                int3 posI = int3(floor(relativePos / binLength));
                 return posI;
             }
 

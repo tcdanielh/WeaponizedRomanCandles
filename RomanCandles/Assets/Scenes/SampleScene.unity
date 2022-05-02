@@ -803,8 +803,8 @@ MonoBehaviour:
   ejectaHandler: {fileID: 11400000, guid: 3474f0401f04b8143b0087688a4fcd09, type: 2}
   smokeColor: {r: 0.8301887, g: 0.8301887, b: 0.8301887, a: 0}
   SmokeCellSideLength: 0.05
-  SmokeGridDimensions: {x: 10, y: 10, z: 10}
-  hashBinSideLength: 1
+  SmokeGridDimensions: {x: 40, y: 20, z: 20}
+  hashBinSideLength: 2
   EjectaPerBin: 5
   gridMinPoint: {x: -10, y: 0, z: -10}
   shader: {fileID: 4800000, guid: aaec266f2e93e4c41acbd4aaf6193019, type: 3}
