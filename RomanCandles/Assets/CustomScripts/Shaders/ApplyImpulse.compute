@@ -16,26 +16,33 @@ float time, radius, power, force, dt;
 void AddDensity (uint3 id : SV_DispatchThreadID)
 {
   // TODO: insert actual code here!
-    //float3 pos = id.xyz - position.xyz;
-    float3 pos = id/(size.xyz-1.0f) - position.xyz;
+
+    float3 pos = id.xyz - position.xyz;
+    
+    //float3 pos = id/(size.xyz-1.0f) - position.xyz;
+   
 	float magnitude = pos.x*pos.x + pos.y*pos.y + pos.z*pos.z;
     //float distance = sqrt(magnitude);
-    /*
+     /*
     if(magnitude < radius) {
-        Result[id.xyz] = float4(1000.0, 0.0, 0.0, 0.0);
+        Result[id.xyz] = Prev[id] + float4(100.0, 0.0, 0.0, 0.0);
     } else {
-        Result[id.xyz] = float4(0.0, 0.0, 0.0, 0.0);
-    }
-    */
-    /**/
+        Result[id.xyz] = Prev[id];
+    }*/
+    
+    /*
     //Result[id.xyz] = max(radius - distance, 0.0f) * 100;
-	float radius2 = radius*radius;
+	
 	//float threshold = 15.0f;
-	float quantity = exp(-magnitude/radius2) * power;
-    //float quantity = max(radius - distance, 0.0);
+	
+    float quantity = max(radius - distance, 0.0);
     //Result[id.xyz] = vector4(quantity, 0.0, 0.0, 0.0);
+    */
+    
+    float radius2 = radius*radius;
+    float quantity = exp(-magnitude/radius2) * power;
     Result[id.xyz] = Prev[id.xyz] + float4(quantity, 0.0, 0.0, 0.0);///quantity;
-
+    
 }
 
 #pragma kernel ApplyForce
@@ -46,6 +53,6 @@ void ApplyForce (uint3 id : SV_DispatchThreadID)
     float3 c = force * dt * exp(pow(id/(size.xyz-1.0f) - position.xyz, 2.0f) / radius);
     Result[id.xyz] = Prev[id.xyz] + float4(c, 0.0);
     
-    //Result[id.xyz] = float4(0.0, 0, 10.0, 0);
+    //Result[id.xyz] = float4(0.0f, 1000.0f, 0.0f, 0);
 }
 
