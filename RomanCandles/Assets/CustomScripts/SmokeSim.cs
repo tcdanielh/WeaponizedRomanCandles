@@ -27,9 +27,17 @@ public class SmokeSim : MonoBehaviour
     public float StepTime = 0.2f;
     float lastUpdate = 0.0f;
 
-    void Start()
+    [SerializeField] Vector3 smokeGridCells;
+    [SerializeField] Vector3 gridMin;
+    [SerializeField] float cellSize;
+
+    public void SmokeStart()
     {
-        size = 512;
+        gridMin = GetComponent<ScreenWriter>().gridMinPoint;
+        smokeGridCells = GetComponent<ScreenWriter>().smokeGridCells;
+        cellSize = GetComponent<ScreenWriter>().SmokeCellSideLength;
+        //size = 512;
+        size = Mathf.CeilToInt(Mathf.Max(smokeGridCells.x, Mathf.Max( smokeGridCells.y, smokeGridCells.z)));
         textureSize = new Vector4(size, size, size, 0.0f);
 
         smokeDensity = new RenderTexture[2];
@@ -70,19 +78,32 @@ public class SmokeSim : MonoBehaviour
         }
         
         //debugging values
-        impulsePosition = new Vector4(9.0f, 9.0f, 13.0f, 0.0f);
-        impulseRadius = 7.0f;//90.0f;//7.0f;//6.0f;
+        //impulsePosition = new Vector4(9.0f, 9.0f, 13.0f, 0.0f);
+        impulseRadius = 15.0f;//90.0f;//7.0f;//6.0f;
         impulsePower = 20.0f;//40.0f;
         buoyancy = 10.0f;
         tempAmbient = 30.0f;
         dissipation = 0.97f;
         k = 10000000.0f;
+
+
+
+        //relative position
+        impulsePosition = localPosition(impulsePosition);
+
         AddDensity(impulsePosition, textureSize, impulseRadius, impulsePower);
         ApplyForce(impulsePosition, textureSize, impulseRadius, impulsePower, .1f);
         AddTemperature(impulsePosition, textureSize, impulseRadius, impulsePower / 80);
          
     }
 
+    Vector4 localPosition(Vector4 p)
+    {
+        p = p - new Vector4(gridMin.x, gridMin.y, gridMin.z);
+        p /= cellSize;
+        return new Vector4(Mathf.Floor(p.x), Mathf.Floor(p.y), Mathf.Floor(p.z));
+    }
+         
     void FixedUpdate()
     {     
      
@@ -96,6 +117,11 @@ public class SmokeSim : MonoBehaviour
         
         
 
+    }
+
+    private void Update()
+    {
+        AddDensity(impulsePosition, textureSize, impulseRadius, impulsePower);
     }
 
     public void AddDensity(Vector4 position, Vector4 textureSize, float radius, float power) {

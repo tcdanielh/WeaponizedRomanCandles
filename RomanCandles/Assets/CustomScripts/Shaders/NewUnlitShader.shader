@@ -48,7 +48,7 @@ Shader "Unlit/NewUnlitShader"
             float3 BoundsMax;
             Texture3D<float4> Shape;
             SamplerState samplerShape;
-            float smokeScale;
+            float smokeCellSize;
 
             float numSteps;
             float numStepsLight;
@@ -113,17 +113,25 @@ Shader "Unlit/NewUnlitShader"
                 //float4 samp = Shape.SampleLevel(samplerShape, p,0);
                 //return samp.x;
 
-                uint3 pos = uint3(uint(floor(p.x * 30)) % 256, uint(floor(p.y * 30)) % 256, uint(floor(p.z * 30)) % 256);
-                float4 samp = Shape[pos];
+                //uint3 pos = uint3(uint(floor(p.x * 30)) % 256, uint(floor(p.y * 30)) % 256, uint(floor(p.z * 30)) % 256);
+                ////float4 samp = Shape[pos];
+                ////float density = max(0, samp.r);
+                ////debug
+                //float density = float(pos.x) / 256;
+                //return density;
+
+                float3 relativePos = p - gridMin.xyz;
+                if (relativePos.x < 0 || relativePos.y < 0 || relativePos.z < 0) return 0;
+                uint3 posI = uint3(floor(relativePos / smokeCellSize));
+                float4 samp = Shape[posI];
                 float density = max(0, samp.r);
                 return density;
-
                 //return max(0, sin(p.x) + sin(p.y * 0.5) + sin(p.z))/3.0;
             }
 
             int3 binCoord(float3 pos) {
                 float3 relativePos = pos - gridMin.xyz;
-                int3 posI = int3(floor(pos / binLength));
+                int3 posI = int3(floor(relativePos / binLength));
                 return posI;
             }
 
