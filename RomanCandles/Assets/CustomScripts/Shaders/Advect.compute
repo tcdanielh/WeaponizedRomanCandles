@@ -1,0 +1,72 @@
+// Each #kernel tells which function to compile; you can have many kernels
+
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+Texture3D<float4> Prev;
+RWTexture3D<float4> Result;
+
+Texture3D<float4> Velocity;
+
+float4 size;
+
+float dissipation, dt;
+
+
+float3 preAdvectPos(uint3 id) {
+    return id - Velocity[id.xyz].xyz / size.x * dt; 
+}
+
+float4 BiLerp(Texture3D<float4> prev, float4 size, float3 pos){
+
+
+    float3 xp1 = float3(1.0, 0.0, 0.0);
+    float3 yp1 = float3(0.0, 1.0, 0.0);
+    float3 zp1 = float3(0.0, 0.0, 1.0);
+
+    return (prev[pos+xp1] + prev[pos+yp1] + prev[pos+zp1] + prev[pos-xp1] + prev[pos-yp1] + prev[pos-zp1]) / 6.0 ;
+
+   /*
+    int x = pos.x;
+	int y = pos.y;
+	int z = pos.z;
+	
+	int X = size.x;
+	int XY = size.x*size.y;
+	
+	float fx = pos.x-x;
+	float fy = pos.y-y;
+	float fz = pos.z-z;
+	
+	int xp1 = min(size.x-1, x+1);
+	int yp1 = min(size.y-1, y+1);
+	int zp1 = min(size.z-1, z+1);
+	
+	float4 x0 = prev[pos] * (1.0f-fx) + prev[float3(xp1, pos.yz)] * fx;
+	float4 x1 = prev[float3(pos.xy, zp1)] * (1.0f-fx) + prev[float3(xp1, pos.y, zp1)] * fx;
+	
+	float4 x2 = prev[float3(pos.x, yp1, pos.z)] * (1.0f-fx) + prev[float3(xp1, yp1, pos.z)] * fx;
+	float4 x3 = prev[float3(pos.x, yp1, zp1)] * (1.0f-fx) + prev[float3(xp1, yp1, zp1)] * fx;
+	
+	float4 z0 = x0 * (1.0f-fz) + x1 * fz;
+	float4 z1 = x2 * (1.0f-fz) + x3 * fz;
+	
+	return z0 * (1.0f-fy) + z1 * fy;*/
+    
+}
+
+#pragma kernel AdvectDensity
+[numthreads(8,8,8)]
+
+void AdvectDensity (uint3 id : SV_DispatchThreadID)    
+{
+
+    float3 pos = id - Velocity[id.xyz].xyz / (size.xyz - 1.0f)  * dt;/// (size.x);
+    //float3 pos = id/(size.xyz-1.0f) - position.xyz;
+    // TODO: insert actual code here!
+    //float3 advectPos = preAdvectPos(id);
+
+    Result[id.xyz] = BiLerp(Prev, size, pos) * dissipation;
+}//Prev[id.xyz] * dissipation;//
+
+

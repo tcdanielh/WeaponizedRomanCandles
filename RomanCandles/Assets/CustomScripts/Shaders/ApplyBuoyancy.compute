@@ -1,0 +1,24 @@
+// Each #kernel tells which function to compile; you can have many kernels
+#pragma kernel ApplyBuoyancy
+
+// Create a RenderTexture with enableRandomWrite flag and set it
+// with cs.SetTexture
+Texture3D<float4> Prev;
+RWTexture3D<float4> Result;
+
+Texture3D<float4> Temperture;
+Texture3D<float4> Density;
+
+float dt, tempAbient, buoyancy, k;
+
+
+[numthreads(8,8,8)]
+void ApplyBuoyancy (uint3 id : SV_DispatchThreadID)
+{
+    // TODO: insert actual code here!
+    float d = Density[id.xyz].x;
+    float temp = Temperture[id.xyz].x;
+    float4 vert = float4(0.0f, 1.0f, 0.0f, 0.0f);
+
+    Result[id.xyz] = Prev[id.xyz] + vert * (-k * d + buoyancy * (temp - tempAbient)) * dt;
+}
