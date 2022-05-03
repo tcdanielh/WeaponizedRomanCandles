@@ -18,11 +18,9 @@ float binLength; //length of each bin in worldspace
 int binSize; //maximum number of ejecta per bin
 int3 binsPerAxis;
 
-float rand;
-
 int3 binCoord(float3 pos) {
     float3 relativePos = pos - gridMin.xyz;
-    int3 posI = int3(floor(relativePos/binLength));
+    int3 posI = int3(floor(pos/binLength));
     return posI;
 }
 
@@ -37,7 +35,7 @@ float3 colorToCoord(float4 c) {
 }
 float4 coordToColor(float3 p) {
     float3 t = p - gridMin.xyz;
-    return float4(t.x / gridSize.x, t.y / gridSize.y, t.z / gridSize.z, rand);
+    return float4(t.x / gridSize.x, t.y / gridSize.y, t.z / gridSize.z, 1.0);
 }
 
 int bin(float3 pos) {
