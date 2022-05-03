@@ -78,6 +78,7 @@ int3 localPos(float3 pos) {
 void CreateTrails(uint3 id : SV_DispatchThreadID)
 {
     Ejecta e = Ejectas[id.x];
+    if (e.pos.y < 0.1) return;
     int3 b = localPos(e.pos);
     for (int i = b.x - 10; i <= b.x + 10; i++) {
         for (int j = b.y - 10; j <= b.y + 10; j++) {

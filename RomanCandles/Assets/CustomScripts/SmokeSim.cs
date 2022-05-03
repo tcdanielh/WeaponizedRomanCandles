@@ -89,11 +89,11 @@ public class SmokeSim : MonoBehaviour
 
 
         //relative position
-        impulsePosition = localPosition(impulsePosition);
-        
-        AddDensity(impulsePosition, textureSize, impulseRadius, impulsePower);
-        ApplyForce(impulsePosition, textureSize, impulseRadius, impulsePower, .1f);
-        AddTemperature(impulsePosition, textureSize, impulseRadius, impulsePower / 80);
+        //impulsePosition = localPosition(impulsePosition);
+        //
+        //AddDensity(impulsePosition, textureSize, impulseRadius, impulsePower);
+        //ApplyForce(impulsePosition, textureSize, impulseRadius, impulsePower, .1f);
+        //AddTemperature(impulsePosition, textureSize, impulseRadius, impulsePower / 80);
          
     }
 
