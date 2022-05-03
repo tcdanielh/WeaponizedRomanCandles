@@ -3,11 +3,11 @@
 
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
-Texture3D<float4> Prev;
+RWTexture3D<float4> Prev;
 RWTexture3D<float4> Result;
 
-Texture3D<float4> Temperture;
-Texture3D<float4> Density;
+RWTexture3D<float4> Temperture;
+RWTexture3D<float4> Density;
 
 float dt, tempAbient, buoyancy, k;
 

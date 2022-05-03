@@ -3,10 +3,10 @@
 
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
-Texture3D<float4> Prev;
+RWTexture3D<float4> Prev;
 RWTexture3D<float4> Result;
 
-Texture3D<float4> Velocity;
+RWTexture3D<float4> Velocity;
 
 float4 size;
 
@@ -17,7 +17,7 @@ float3 preAdvectPos(uint3 id) {
     return id - Velocity[id.xyz].xyz / size.x * dt; 
 }
 
-float4 BiLerp(Texture3D<float4> prev, float4 size, float3 pos){
+float4 BiLerp(RWTexture3D<float4> prev, float4 size, float3 pos){
 
 
     float3 xp1 = float3(1.0, 0.0, 0.0);
@@ -61,8 +61,9 @@ float4 BiLerp(Texture3D<float4> prev, float4 size, float3 pos){
 void AdvectDensity (uint3 id : SV_DispatchThreadID)    
 {
 
-    float3 pos = id - Velocity[id.xyz].xyz / (size.xyz - 1.0f)  * dt;/// (size.x);
-    //float3 pos = id/(size.xyz-1.0f) - position.xyz;
+    //float3 pos = id - Velocity[id.xyz].xyz / (size.xyz - 1.0f)  * dt;/// (size.x);
+    float3 pos = float3(id.x+1.0f, id.y, id.z);
+	//float3 pos = id/(size.xyz-1.0f) - position.xyz;
     // TODO: insert actual code here!
     //float3 advectPos = preAdvectPos(id);
 
