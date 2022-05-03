@@ -24,7 +24,7 @@ public class SmokeSim : MonoBehaviour
     //other buffer variables go here
     // Start is called before the first frame update
 
-    public float StepTime = 0.5f;
+    public float StepTime = 5.0f;
     float lastUpdate = 0.0f;
 
     [SerializeField] Vector3 smokeGridCells;
@@ -106,29 +106,29 @@ public class SmokeSim : MonoBehaviour
          
     void FixedUpdate()
     {     
-     /*
-        //float dt = Time.deltaTime;
-        //AdvectDensity(textureSize, dissipation, dt);
+     
+        float dt = Time.deltaTime;
 
         if(lastUpdate > StepTime) {
-            //AdvectDensity(textureSize, dissipation, dt);
+            AdvectDensity(textureSize, dissipation, dt);
             //ApplyBuoyancy(buoyancy, tempAmbient, dt);
             lastUpdate = 0.0f;
         }
         lastUpdate += Time.deltaTime;
-        Debug.Log(lastUpdate);
+        //Debug.Log(lastUpdate);
         
-       */ 
+       
 
     }
 
     private void Update()
     {
    
-        //AddDensity(impulsePosition, textureSize, impulseRadius, impulsePower);
+        AddDensity(impulsePosition, textureSize, impulseRadius, impulsePower);
         float dt = 1.0f;//Time.deltaTime;
-        AdvectDensity(textureSize, dissipation, dt);
-        ApplyBuoyancy(buoyancy, tempAmbient, dt);
+        //AdvectDensity(textureSize, dissipation, dt);
+
+        //ApplyBuoyancy(buoyancy, tempAmbient, dt);
        
     }
 
