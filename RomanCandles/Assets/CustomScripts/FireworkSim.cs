@@ -57,9 +57,14 @@ public class FireworkSim : MonoBehaviour
 
     [SerializeField] bool debug = false;
 
+    SmokeSim smokeSim;
+    [SerializeField] float smokeRadius;
+    [SerializeField] float smokePower;
+
     // Start is called before the first frame update
     void Start()
     {
+        smokeSim = GameObject.Find("Main Camera").GetComponent<SmokeSim>();
         birthTime = Time.time;
         ejectaHandler.addFirework(this);
         exploded = false;
@@ -106,21 +111,21 @@ public class FireworkSim : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
-        Debug.Log("mr = " + m_r);
+        //Debug.Log("mr = " + m_r);
         if (Time.time < rocketLauchTime + t_e)
         {
-            Debug.Log("A");
+            //Debug.Log("A");
             Ascent();
         }
         else if (!exploded)
         {
-            Debug.Log("E");
+            //Debug.Log("E");
             exploded = true;
             Explosion();
         }
         else
         {
-            Debug.Log("D");
+            //Debug.Log("D");
             Descent();
         }
         //Debug.Log("pos = " + es[0].pos);
@@ -132,6 +137,12 @@ public class FireworkSim : MonoBehaviour
                 spheres[i].transform.position = es[i].pos;
             }
         }
+
+        //foreach (ScreenWriter.Ejecta e in es)
+        //{
+        //    smokeSim.MakeSmokeAtPoint(e.pos, smokeRadius, smokePower);
+        //}
+        smokeSim.MakeTrials(es, smokeRadius, smokePower);
         
     }
 
@@ -191,8 +202,8 @@ public class FireworkSim : MonoBehaviour
 
             
         }
-        Debug.Log("post exp pos = " + es[1].pos);
-        Debug.Log("post exp v = " + es[1].v);
+        //Debug.Log("post exp pos = " + es[1].pos);
+        //Debug.Log("post exp v = " + es[1].v);
     }
 
     void Descent()

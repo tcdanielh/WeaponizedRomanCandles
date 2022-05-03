@@ -803,7 +803,7 @@ MonoBehaviour:
   ejectaHandler: {fileID: 11400000, guid: 3474f0401f04b8143b0087688a4fcd09, type: 2}
   smokeColor: {r: 0.8301887, g: 0.8301887, b: 0.8301887, a: 0}
   SmokeCellSideLength: 0.05
-  SmokeGridDimensions: {x: 10, y: 10, z: 10}
+  SmokeGridDimensions: {x: 20, y: 20, z: 10}
   smokeGridCells: {x: 0, y: 0, z: 0}
   hashBinSideLength: 1
   EjectaPerBin: 5
@@ -828,7 +828,6 @@ MonoBehaviour:
   ejectaLightIntensity: 1
   ejectaColor: {r: 1, g: 0.2028302, b: 0.2028302, a: 0}
   sun: {fileID: 705507995}
-  EjectaSize: 5
 --- !u!114 &963194231
 MonoBehaviour:
   m_ObjectHideFlags: 0

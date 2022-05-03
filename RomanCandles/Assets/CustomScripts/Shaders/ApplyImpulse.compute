@@ -10,6 +10,9 @@ float4 position, size;
 
 float time, radius, power, force, dt;
 
+float4 gridMin;
+float cellSize;
+
 
 #pragma kernel AddDensity
 [numthreads(8,8,8)]
@@ -54,5 +57,41 @@ void ApplyForce (uint3 id : SV_DispatchThreadID)
     Result[id.xyz] = Prev[id.xyz] + float4(c, 0.0);
     
     //Result[id.xyz] = float4(0.0f, 1000.0f, 0.0f, 0);
+}
+
+struct Ejecta {
+    float3 pos;
+    float3 v;
+    float4 color;
+    int landed;
+};
+RWStructuredBuffer<Ejecta> Ejectas;
+
+int3 localPos(float3 pos) {
+    float3 relativePos = pos - gridMin.xyz;
+    int3 posI = int3(floor(relativePos / cellSize));
+    return posI;
+}
+
+#pragma kernel CreateTrails
+[numthreads(10, 1, 1)]
+void CreateTrails(uint3 id : SV_DispatchThreadID)
+{
+    Ejecta e = Ejectas[id.x];
+    int3 b = localPos(e.pos);
+    for (int i = b.x - 10; i <= b.x + 10; i++) {
+        for (int j = b.y - 10; j <= b.y + 10; j++) {
+            for (int k = b.z - 10; k <= b.z + 10; k++) {
+                int3 p = int3(i, j, k); 
+                float3 pos = p - b;
+                float magnitude = pos.x * pos.x + pos.y * pos.y + pos.z * pos.z;
+                float radius2 = radius * radius;
+                float quantity = exp(-magnitude / radius2) * power;
+                Result[p] = Prev[p] + float4(quantity, 0.0, 0.0, 0.0);///quantity;
+                //Result[p] = Prev[p] + float4(power, 0.0, 0.0, 0.0);///quantity;
+                //Result[p] = float4(1, 1, 1, 1);
+            }
+        }
+    }
 }
 

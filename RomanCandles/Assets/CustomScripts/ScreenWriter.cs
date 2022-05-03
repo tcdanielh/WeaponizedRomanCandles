@@ -52,7 +52,7 @@ public class ScreenWriter : MonoBehaviour
     }
 
 
-    public int EjectaSize = (sizeof(float) * 10) + sizeof(int);
+    public static int EjectaSize = (sizeof(float) * 10) + sizeof(int);
 
     Ejecta[] es = new Ejecta[0];
 
@@ -154,7 +154,7 @@ public class ScreenWriter : MonoBehaviour
         material.SetVector("BoundsMax", container.position + container.localScale / 2);
         //material.SetTexture("Shape", smoke.getPerlinTexture());
         material.SetTexture("Shape", smokeSim.smokeDensity[0]);
-        material.SetInt("numSteps", 40);
+        material.SetInt("numSteps", 20);
         material.SetInt("numStepsLight", 20);
         material.SetVector("lPos", lightPoint.position);
         material.SetVector("lColor", ejectaColor);

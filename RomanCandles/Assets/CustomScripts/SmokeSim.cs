@@ -90,7 +90,7 @@ public class SmokeSim : MonoBehaviour
 
         //relative position
         impulsePosition = localPosition(impulsePosition);
-
+        
         AddDensity(impulsePosition, textureSize, impulseRadius, impulsePower);
         ApplyForce(impulsePosition, textureSize, impulseRadius, impulsePower, .1f);
         AddTemperature(impulsePosition, textureSize, impulseRadius, impulsePower / 80);
@@ -193,5 +193,31 @@ public class SmokeSim : MonoBehaviour
         RenderTexture temp = textures[READ];
         textures[READ] = textures[WRITE];
         textures[WRITE] = temp; 
+    }
+
+    public void MakeSmokeAtPoint(Vector3 pos, float rad, float pow)
+    {
+        AddDensity(localPosition(new Vector4(pos.x, pos.y, pos.z)), textureSize, rad, pow);
+    }
+
+    public void MakeTrials(ScreenWriter.Ejecta[] es, float rad, float pow)
+    {
+        Debug.Log("making trails");
+        int kernelHandle = impulseShader.FindKernel("CreateTrails");
+        impulseShader.SetTexture(kernelHandle, "Prev", smokeDensity[READ]);
+        impulseShader.SetTexture(kernelHandle, "Result", smokeDensity[WRITE]);
+        impulseShader.SetFloat("power", pow);
+        impulseShader.SetFloat("radius", rad);
+
+        ComputeBuffer ejectaBuffer = new ComputeBuffer(es.Length, ScreenWriter.EjectaSize);
+        ejectaBuffer.SetData(es);
+
+        impulseShader.SetBuffer(kernelHandle, "Ejectas", ejectaBuffer);
+        impulseShader.SetVector("gridMin", gridMin);
+        impulseShader.SetFloat("cellSize", cellSize);
+        impulseShader.SetVector("size", textureSize);
+        impulseShader.Dispatch(kernelHandle, ejectaBuffer.count / 10, 1, 1);
+        ejectaBuffer.Release();
+        Switch(smokeDensity);
     }
 }
