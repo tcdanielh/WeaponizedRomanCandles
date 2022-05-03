@@ -3,7 +3,10 @@ guid: 66b773f604df5994f992487acee32453
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - impulseShader: {fileID: 7200000, guid: 481949076cfaa084cad0582a3eddd130, type: 3}
+  - advectShader: {fileID: 7200000, guid: da4b20a8c71e8104abdec61cbf7f4923, type: 3}
+  - buoyancyShader: {fileID: 7200000, guid: 926235fa1af360941b1cdff79fa93769, type: 3}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 
