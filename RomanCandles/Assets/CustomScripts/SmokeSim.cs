@@ -83,7 +83,7 @@ public class SmokeSim : MonoBehaviour
         impulsePower = 20.0f;//40.0f;
         buoyancy = 10.0f;
         tempAmbient = 30.0f;
-        dissipation = 0.98f;
+        dissipation = 0.9999998f;
         k = 10000000.0f;
 
 
@@ -108,9 +108,9 @@ public class SmokeSim : MonoBehaviour
     {
 
         float dt = Time.fixedDeltaTime;
-
-        if(lastUpdate > StepTime) {
-            AdvectDensity(textureSize, dissipation, dt);
+        AdvectDensity(textureSize, dissipation, dt);
+        if (lastUpdate > StepTime) {
+            //AdvectDensity(textureSize, dissipation, dt);
             //ApplyBuoyancy(buoyancy, tempAmbient, dt);
             lastUpdate = 0.0f;
         }
