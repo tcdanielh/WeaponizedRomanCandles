@@ -105,16 +105,16 @@ public class SmokeSim : MonoBehaviour
     }
          
     void FixedUpdate()
-    {     
-     
-        float dt = Time.deltaTime;
+    {
+
+        float dt = Time.fixedDeltaTime;
 
         if(lastUpdate > StepTime) {
             AdvectDensity(textureSize, dissipation, dt);
             //ApplyBuoyancy(buoyancy, tempAmbient, dt);
             lastUpdate = 0.0f;
         }
-        lastUpdate += Time.deltaTime;
+        lastUpdate += Time.fixedDeltaTime;
         //Debug.Log(lastUpdate);
         
        
