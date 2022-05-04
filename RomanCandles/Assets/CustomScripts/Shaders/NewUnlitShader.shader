@@ -188,7 +188,7 @@ Shader "Unlit/NewUnlitShader"
             float3 ejectaMarch(float3 ro) {
                 pointLight light = ClosestLight(ro);
                 float3 lPos = light.pos;
-                if (lPos.x < 0) return float3(0, 0, 0);
+                if (lPos.y < 0) return float3(0, 0, 0);
                 //return float3(0, 1, 1);
                 float3 rd = normalize(lPos - ro);
                 float distToLight = length(lPos - ro);

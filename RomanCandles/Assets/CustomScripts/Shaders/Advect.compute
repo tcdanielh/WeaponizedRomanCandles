@@ -62,7 +62,7 @@ void AdvectDensity (uint3 id : SV_DispatchThreadID)
 {
 
     //float3 pos = id - Velocity[id.xyz].xyz / (size.xyz - 1.0f)  * dt;/// (size.x);
-    float3 pos = float3(id.x+1.0f, id.y, id.z);
+    float3 pos = float3(id.x, id.y, id.z);
 	//float3 pos = id/(size.xyz-1.0f) - position.xyz;
     // TODO: insert actual code here!
     //float3 advectPos = preAdvectPos(id);
