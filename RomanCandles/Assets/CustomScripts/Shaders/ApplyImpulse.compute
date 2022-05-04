@@ -62,7 +62,8 @@ void ApplyForce (uint3 id : SV_DispatchThreadID)
     //8 bits to store per channel 0 -> 255, values are mapped from 0 to 1
     //input velocity is from [-128, 127]
     //convert to [0, 255] by adding 128 then divide by 255 to get [0, 1]
-    Result[id] = Prev[id] + (float4(2.0f, 0.0f, 0.0f, 0) + 128.0f) / 255.0f;
+    //Result[id] =  (float4(1, 0, 0, 0)) / 255.0f;//(float4(1.0f, 0.0f, 0.0f, 0.0f) + 128.0f) / 255.0f;
+    Result[id] =  (float4((max(1, log(id.y)) / 2), log(id.x) - 5, 0, 0)) / 255.0f;
     //Result[id] = Prev[id] + (float4((sin(id.y) + 2), 0, 0 ,0 ) + 128.0f) / 255.0f;
 }
 

@@ -67,8 +67,11 @@ void AdvectDensity (uint3 id : SV_DispatchThreadID)
     //multiply by 255 to get [0, 255] 
 	//subtract by -128 to get [-128, 127]
     
-	int3 velocity = Velocity[id].xyz * (pow(2, 8) - 1.0f) - 128.0f;//convert float to int
-	Result[id] = dissipation * BiLerp(Prev, size, id - velocity);
+	//float3 velocity = Velocity[id].xyz * (pow(2, 8) - 1.0f) - 128.0f;//convert float to int
+	//Result[id] = dissipation * BiLerp(Prev, size, id - velocity);
+	//Result[id] = Prev[id - velocity.xyz];
+	//Result[id] =  Prev[id - (Velocity[id].xyz * 255.0f)];
+	Result[id] = dissipation * BiLerp(Prev, size, id - Velocity[id].xyz * 255.0f);
 }
 
 

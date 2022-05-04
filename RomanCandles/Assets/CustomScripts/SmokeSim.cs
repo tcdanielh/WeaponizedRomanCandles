@@ -85,7 +85,7 @@ public class SmokeSim : MonoBehaviour
         impulsePower = 20.0f;//40.0f;
         buoyancy = 100000.0f;
         tempAmbient = 1000.0f;
-        dissipation = 0.97f;
+        dissipation = 0.99f;
         k = 0.0f;
 
 
@@ -94,8 +94,8 @@ public class SmokeSim : MonoBehaviour
         impulsePosition = localPosition(impulsePosition);
         //
         float dt=0.0f;
-        AddDensity(impulsePosition, textureSize, impulseRadius, impulsePower);
-        ApplyBuoyancy(buoyancy, tempAmbient, dt);
+        //AddDensity(impulsePosition, textureSize, impulseRadius, impulsePower);
+        //ApplyBuoyancy(buoyancy, tempAmbient, dt);
         ApplyForce(impulsePosition, textureSize, impulseRadius, impulsePower, dt);
         //AddTemperature(impulsePosition, textureSize, impulseRadius, impulsePower);
          
@@ -122,26 +122,21 @@ public class SmokeSim : MonoBehaviour
         //Debug.Log(lastUpdate);
         
        */
-       
+        
+        
       
 
     }
 
     private void Update()
     {
-   
+        float dt = 0.0f;
         //AddDensity(impulsePosition, textureSize, impulseRadius, impulsePower);
+        AdvectDensity(textureSize, dissipation, dt); 
        //Time.deltaTime;
         //ApplyBuoyancy(buoyancy, tempAmbient, dt);
-        float dt = 0.0f;
-        AdvectDensity(textureSize, dissipation, dt);
-        
-        
-        
-      
-
-        
        
+      
     }
 
     public void AddDensity(Vector4 position, Vector4 textureSize, float radius, float power) {
