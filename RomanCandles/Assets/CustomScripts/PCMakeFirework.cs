@@ -16,7 +16,17 @@ public class PCMakeFirework : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.F))
         {
-            Instantiate(fireworkPrefab).GetComponent<FireworkSim>().color = Random.ColorHSV();
+            Vector2 angle = Random.insideUnitCircle;
+            angle /= 3;
+            Vector3 dir = Vector3.up + new Vector3(angle.x, 0, angle.y);
+            dir.Normalize();
+            Vector2 pos = Random.insideUnitCircle;
+            pos *= 2;
+            Vector3 p3 = new Vector3(pos.x, 0, pos.y);
+            FireworkSim fsim = Instantiate(fireworkPrefab).GetComponent<FireworkSim>();
+            fsim.color = Random.ColorHSV();
+            fsim.playerTraj = dir;
+            fsim.playerOrigin = p3;
         }
     }
 }

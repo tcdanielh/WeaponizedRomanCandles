@@ -55,9 +55,9 @@ void CSMain (uint3 id : SV_DispatchThreadID)
     //        break;
     //    }
     //}
-    for (int i = b.x - 1; i <= b.x + 1; i++) {
-        for (int j = b.y - 1; j <= b.y + 1; j++) {
-            for (int k = b.z - 1; k <= b.z + 1; k++) {
+    for (int i = b.x - 5; i <= b.x + 5; i++) {
+        for (int j = b.y - 5; j <= b.y + 5; j++) {
+            for (int k = b.z - 5; k <= b.z + 5; k++) {
                 int3 p = int3(i, j, k);
                 if (p.x < 0 || p.y < 0 || p.z < 0 || p.x > gridSize.x || p.y > gridSize.y || p.z > gridSize.z) continue;
                 float3 binCenter = worldCoord(p);
