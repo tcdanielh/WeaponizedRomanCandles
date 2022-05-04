@@ -118,7 +118,7 @@ public class SmokeSim : MonoBehaviour
             //ApplyBuoyancy(buoyancy, tempAmbient, dt);
             lastUpdate = 0.0f;
         }
-        lastUpdate += Time.deltaTime;
+        lastUpdate += Time.fixedDeltaTime;
         //Debug.Log(lastUpdate);
         
        */

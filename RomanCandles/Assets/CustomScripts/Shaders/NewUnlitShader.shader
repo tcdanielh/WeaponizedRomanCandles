@@ -104,6 +104,12 @@ Shader "Unlit/NewUnlitShader"
                 return min(1, abs(noise.x + noise.y) * 0.5);
             }
 
+            float sampLerp(int3 a, int3 b, float s) {
+                float va = max(0, Shape[a].r);
+                float vb = max(0, Shape[b].r);
+                return lerp(va, vb, s);
+            }
+
             float sampleDensity(float3 p) {
                 //TODO replace with actuall function
                 //float2 noise = (frac(sin(dot(uv, float2(12.9898, 78.233) * 2.0)) * 43758.5453));
@@ -122,10 +128,21 @@ Shader "Unlit/NewUnlitShader"
 
                 float3 relativePos = p - gridMin.xyz;
                 if (relativePos.x < 0 || relativePos.y < 0 || relativePos.z < 0) return 0;
-                uint3 posI = uint3(floor(relativePos / smokeCellSize));
-                float4 samp = Shape[posI];
-                float density = max(0, samp.r);
-                return density;
+                relativePos = relativePos / smokeCellSize;
+                int3 posI = int3(floor(relativePos));
+                float3 diff = relativePos - float3(posI);
+                float x1 = sampLerp(posI, posI + int3(1, 0, 0), diff.x);
+                float x2 = sampLerp(posI + int3(0,1,0), posI + int3(1, 1, 0), diff.x);
+                float y1 = lerp(x1, x2, diff.y);
+                x1 = sampLerp(posI + int3(0, 0, 1), posI + int3(1, 0, 1), diff.x);
+                x2 = sampLerp(posI + int3(0, 1, 1), posI + int3(1, 1, 1), diff.x);
+                float y2 = lerp(x1, x2, diff.y);
+                return lerp(y1, y2, diff.z);
+
+                //float4 samp = Shape[posI];
+                //float density = max(0, samp.r);
+                //return density;
+                
                 //return max(0, sin(p.x) + sin(p.y * 0.5) + sin(p.z))/3.0;
             }
 
@@ -188,7 +205,7 @@ Shader "Unlit/NewUnlitShader"
             float3 ejectaMarch(float3 ro) {
                 pointLight light = ClosestLight(ro);
                 float3 lPos = light.pos;
-                if (lPos.x < 0) return float3(0, 0, 0);
+                if (lPos.y < 0) return float3(0, 0, 0);
                 //return float3(0, 1, 1);
                 float3 rd = normalize(lPos - ro);
                 float distToLight = length(lPos - ro);

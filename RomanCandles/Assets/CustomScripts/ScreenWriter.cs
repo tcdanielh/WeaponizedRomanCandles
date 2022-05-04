@@ -85,30 +85,36 @@ public class ScreenWriter : MonoBehaviour
         sunIntensity = sun.GetComponent<Light>().intensity;
     }
 
-    private void OnRenderImage(RenderTexture source, RenderTexture destination)
+    RenderTexture hash;
+    RenderTexture hashC;
+
+    private void FixedUpdate()
     {
-       // es = GetComponent<FireworkSim>().es;
+        if (hash != null && hash.IsCreated())
+            hash.Release();
+        if (hashC != null && hashC.IsCreated())
+            hashC.Release();
         es = ejectaHandler.getEjectas();
         if (es != null && es.Length > 0)
         {
             ejectaBuffer = new ComputeBuffer(es.Length, EjectaSize);
             ejectaBuffer.SetData(es);
         }
-        
+
         //Ejecta Hashing
         //hashBuffer.SetData(new Ejecta[hashBuffer.count]);
-        RenderTexture hash = new RenderTexture(binsPerAxis[0], binsPerAxis[1], 0);
+        hash = new RenderTexture(binsPerAxis[0], binsPerAxis[1], 0);
         hash.volumeDepth = binsPerAxis[2];
         hash.dimension = UnityEngine.Rendering.TextureDimension.Tex3D;
         hash.enableRandomWrite = true;
         hash.Create();
-        
-        RenderTexture hashC = new RenderTexture(binsPerAxis[0], binsPerAxis[1], 0);
+
+        hashC = new RenderTexture(binsPerAxis[0], binsPerAxis[1], 0);
         hashC.volumeDepth = binsPerAxis[2];
         hashC.dimension = UnityEngine.Rendering.TextureDimension.Tex3D;
         hashC.enableRandomWrite = true;
         hashC.Create();
-        
+
 
         EjectaHasher.SetInts("binsPerAxis", binsPerAxis);
         EjectaHasher.SetVector("gridMin", gridMinPoint);
@@ -119,12 +125,18 @@ public class ScreenWriter : MonoBehaviour
         //EjectaHasher.SetBuffer(0, "Hash", hashBuffer);
         EjectaHasher.SetTexture(1, "hashC", hashC);
         EjectaHasher.SetTexture(1, "hash", hash);
-        EjectaHasher.Dispatch(1, hash.width / 8, hash.height / 8, hash.volumeDepth / 8);
+        EjectaHasher.Dispatch(1, hash.width*2 / 8, hash.height*2 / 8, hash.volumeDepth*2 / 8);
 
         EjectaHasher.SetTexture(0, "hashC", hashC);
         EjectaHasher.SetTexture(0, "hash", hash);
         EjectaHasher.Dispatch(0, ejectaBuffer.count / 10, 1, 1);
         ejectaBuffer.Release();
+    }
+
+    private void OnRenderImage(RenderTexture source, RenderTexture destination)
+    {
+       // es = GetComponent<FireworkSim>().es;
+        
 
         //Debug Hash
         //Ejecta[] d = new Ejecta[hashBuffer.count];
@@ -169,8 +181,7 @@ public class ScreenWriter : MonoBehaviour
 
         Graphics.Blit(source, destination, material);
 
-        hash.Release();
-        hashC.Release();
+        
 
     }
     
