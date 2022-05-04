@@ -3,8 +3,10 @@
 
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
-Texture3D<float4> Prev;
+RWTexture3D<float4> Prev;
 RWTexture3D<float4> Result;
+
+RWTexture3D<float4> Temperature;
 
 float4 position, size;
 
@@ -53,10 +55,15 @@ void AddDensity (uint3 id : SV_DispatchThreadID)
 void ApplyForce (uint3 id : SV_DispatchThreadID)
 {
     
-    float3 c = force * dt * exp(pow(id/(size.xyz-1.0f) - position.xyz, 2.0f) / radius);
-    Result[id.xyz] = Prev[id.xyz] + float4(c, 0.0);
+    //float3 c = force * dt * exp(pow(id/(size.xyz-1.0f) - position.xyz, 2.0f) / radius);
+    //Result[id] = Prev[id] + (float4(c, 0.0) + 128.0f) / 255.0f;
     
-    //Result[id.xyz] = float4(0.0f, 1000.0f, 0.0f, 0);
+
+    //8 bits to store per channel 0 -> 255, values are mapped from 0 to 1
+    //input velocity is from [-128, 127]
+    //convert to [0, 255] by adding 128 then divide by 255 to get [0, 1]
+    Result[id] = Prev[id] + (float4(2.0f, 0.0f, 0.0f, 0) + 128.0f) / 255.0f;
+    //Result[id] = Prev[id] + (float4((sin(id.y) + 2), 0, 0 ,0 ) + 128.0f) / 255.0f;
 }
 
 struct Ejecta {
@@ -89,6 +96,7 @@ void CreateTrails(uint3 id : SV_DispatchThreadID)
                 float radius2 = radius * radius;
                 float quantity = exp(-magnitude / radius2) * power;
                 Result[p] = Prev[p] + float4(quantity, 0.0, 0.0, 0.0);///quantity;
+                //Temperature[p] = float4(quantity, 0.0, 0.0, 0.0);
                 //Result[p] = Prev[p] + float4(power, 0.0, 0.0, 0.0);///quantity;
                 //Result[p] = float4(1, 1, 1, 1);
             }

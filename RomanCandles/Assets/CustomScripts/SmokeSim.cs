@@ -44,6 +44,8 @@ public class SmokeSim : MonoBehaviour
         velocity = new RenderTexture[2];
         temperature = new RenderTexture[2];
         pressure = new RenderTexture[2];
+        
+        print(SystemInfo.SupportsRenderTextureFormat(RenderTextureFormat.ARGB32));
 
         for (int i = 0; i < smokeDensity.Length; i++){
             smokeDensity[i] = new RenderTexture(size, size, 0, RenderTextureFormat.ARGB32);
@@ -79,21 +81,23 @@ public class SmokeSim : MonoBehaviour
         
         //debugging values
         //impulsePosition = new Vector4(9.0f, 9.0f, 13.0f, 0.0f);
-        impulseRadius = 15.0f;//90.0f;//7.0f;//6.0f;
+        impulseRadius = 9.0f;//90.0f;//7.0f;//6.0f;
         impulsePower = 20.0f;//40.0f;
-        buoyancy = 10.0f;
-        tempAmbient = 30.0f;
-        dissipation = 0.98f;
-        k = 10000000.0f;
+        buoyancy = 100000.0f;
+        tempAmbient = 1000.0f;
+        dissipation = 0.97f;
+        k = 0.0f;
 
 
 
         //relative position
-        //impulsePosition = localPosition(impulsePosition);
+        impulsePosition = localPosition(impulsePosition);
         //
-        //AddDensity(impulsePosition, textureSize, impulseRadius, impulsePower);
-        //ApplyForce(impulsePosition, textureSize, impulseRadius, impulsePower, .1f);
-        //AddTemperature(impulsePosition, textureSize, impulseRadius, impulsePower / 80);
+        float dt=0.0f;
+        AddDensity(impulsePosition, textureSize, impulseRadius, impulsePower);
+        ApplyBuoyancy(buoyancy, tempAmbient, dt);
+        ApplyForce(impulsePosition, textureSize, impulseRadius, impulsePower, dt);
+        //AddTemperature(impulsePosition, textureSize, impulseRadius, impulsePower);
          
     }
 
@@ -106,29 +110,37 @@ public class SmokeSim : MonoBehaviour
          
     void FixedUpdate()
     {     
-     
+     /*
         float dt = Time.deltaTime;
 
         if(lastUpdate > StepTime) {
-            AdvectDensity(textureSize, dissipation, dt);
+            //AdvectDensity(textureSize, dissipation, dt);
             //ApplyBuoyancy(buoyancy, tempAmbient, dt);
             lastUpdate = 0.0f;
         }
         lastUpdate += Time.deltaTime;
         //Debug.Log(lastUpdate);
         
+       */
        
+      
 
     }
 
     private void Update()
     {
    
-        AddDensity(impulsePosition, textureSize, impulseRadius, impulsePower);
-        float dt = 1.0f;//Time.deltaTime;
-        //AdvectDensity(textureSize, dissipation, dt);
-
+        //AddDensity(impulsePosition, textureSize, impulseRadius, impulsePower);
+       //Time.deltaTime;
         //ApplyBuoyancy(buoyancy, tempAmbient, dt);
+        float dt = 0.0f;
+        AdvectDensity(textureSize, dissipation, dt);
+        
+        
+        
+      
+
+        
        
     }
 
@@ -180,7 +192,7 @@ public class SmokeSim : MonoBehaviour
         buoyancyShader.SetFloat("buoyancy", buoyancy);
         buoyancyShader.SetFloat("k", k);
         buoyancyShader.SetFloat("dt", dt);
-        //impulseShader.SetVector("size", textureSize);
+        buoyancyShader.SetVector("size", textureSize);
         buoyancyShader.Dispatch(kernelHandle, (int) size / 8, (int) size / 8, (int) size / 8);
         Switch(velocity);
     }
@@ -214,6 +226,7 @@ public class SmokeSim : MonoBehaviour
         int kernelHandle = impulseShader.FindKernel("CreateTrails");
         impulseShader.SetTexture(kernelHandle, "Prev", smokeDensity[READ]);
         impulseShader.SetTexture(kernelHandle, "Result", smokeDensity[WRITE]);
+        impulseShader.SetTexture(kernelHandle, "Temperature", temperature[WRITE]);
         impulseShader.SetFloat("power", pow);
         impulseShader.SetFloat("radius", rad);
 

@@ -9,6 +9,8 @@ RWTexture3D<float4> Result;
 RWTexture3D<float4> Temperture;
 RWTexture3D<float4> Density;
 
+float4 size;
+
 float dt, tempAbient, buoyancy, k;
 
 
@@ -18,7 +20,20 @@ void ApplyBuoyancy (uint3 id : SV_DispatchThreadID)
     // TODO: insert actual code here!
     float d = Density[id.xyz].x;
     float temp = Temperture[id.xyz].x;
-    float4 vert = float4(0.0f, 1.0f, 0.0f, 0.0f);
 
-    Result[id.xyz] = Prev[id.xyz] + vert * (-k * d + buoyancy * (temp - tempAbient)) * dt;
+    //8 bits to store per channel 0 -> 255, values are mapped from 0 to 1
+    //storing values from 0 to 255
+    //0 to 122 is negative, 123 is 0 speed, 124 to 255 is positive
+    //122 is slowest negative, 124 is slowest positive
+
+    //8 bits to store per channel 0 -> 255, values are mapped from 0 to 1
+    //input velocity is from [-128, 127]
+    //convert to [0, 255] by adding 128 then divide by 255 to get [0, 1]
+    //float4 vert = (float4(0.0f, 1.0f , 0.0f, 0.0f) + 128.0f) / (pow(2, 8) - 1);
+    float4 vert = float4(0.0f, 1.0f , 0.0f, 0.0f);
+
+    int4 velocity = Prev[id] * (pow(2, 8) - 1.0f) - 128.0f;
+
+    //Result[id.xyz] = Prev[id.xyz] + vert * (-k * d + buoyancy * (temp - tempAbient) * dt) / (pow(2, 8) - 1);
+    Result[id] = ((velocity + vert) + 128.0f) / (pow(2, 8) - 1);///size;
 }
