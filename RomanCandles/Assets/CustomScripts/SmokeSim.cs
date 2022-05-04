@@ -122,9 +122,8 @@ public class SmokeSim : MonoBehaviour
         //Debug.Log(lastUpdate);
         
        */
-        
-        
-      
+        float dt = 0.0f;
+        //AdvectDensity(textureSize, dissipation, dt); 
 
     }
 
@@ -132,7 +131,7 @@ public class SmokeSim : MonoBehaviour
     {
         float dt = 0.0f;
         //AddDensity(impulsePosition, textureSize, impulseRadius, impulsePower);
-        AdvectDensity(textureSize, dissipation, dt); 
+        //AdvectDensity(textureSize, dissipation, dt); 
        //Time.deltaTime;
         //ApplyBuoyancy(buoyancy, tempAmbient, dt);
        
