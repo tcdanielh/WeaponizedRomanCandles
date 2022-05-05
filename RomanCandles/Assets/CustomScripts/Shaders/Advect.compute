@@ -71,7 +71,21 @@ void AdvectDensity (uint3 id : SV_DispatchThreadID)
 	//Result[id] = dissipation * BiLerp(Prev, size, id - velocity);
 	//Result[id] = Prev[id - velocity.xyz];
 	//Result[id] =  Prev[id - (Velocity[id].xyz * 255.0f)];
-	Result[id] = dissipation * BiLerp(Prev, size, id - Velocity[id].xyz * 255.0f);
+	Result[id] = BiLerp(Prev, size, id - Velocity[id].xyz * 255.0f);
+}
+
+#pragma kernel JacobiDiffusion
+[numthreads(8,8,8)]
+
+void JacobiDiffusion (uint3 id : SV_DispatchThreadID) 
+{
+	float3 xp1 = float3(1.0, 0.0, 0.0);
+    float3 yp1 = float3(0.0, 1.0, 0.0);
+    float3 zp1 = float3(0.0, 0.0, 1.0);
+
+	Result[id] = (Prev[id] + dissipation * ((Prev[id+xp1] + Prev[id+yp1] + Prev[id+zp1] + Prev[id-xp1] + Prev[id-yp1] + Prev[id-zp1]) / 6.0)) / (1 + dissipation);
+     
+
 }
 
 

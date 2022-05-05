@@ -27,6 +27,8 @@ public class SmokeSim : MonoBehaviour
     public float StepTime = 5.0f;
     float lastUpdate = 0.0f;
 
+    public int jacobiIterations;
+
     [SerializeField] Vector3 smokeGridCells;
     [SerializeField] Vector3 gridMin;
     [SerializeField] float cellSize;
@@ -85,8 +87,9 @@ public class SmokeSim : MonoBehaviour
         impulsePower = 20.0f;//40.0f;
         buoyancy = 100000.0f;
         tempAmbient = 1000.0f;
-        dissipation = 0.99f;
+        dissipation = 100.2f;
         k = 0.0f;
+        jacobiIterations = 20;
 
 
 
@@ -130,8 +133,9 @@ public class SmokeSim : MonoBehaviour
     private void Update()
     {
         float dt = 0.0f;
+        JacobiDiffusion(dissipation, jacobiIterations);
         //AddDensity(impulsePosition, textureSize, impulseRadius, impulsePower);
-        //AdvectDensity(textureSize, dissipation, dt); 
+        AdvectDensity(textureSize, dissipation, dt); 
        //Time.deltaTime;
         //ApplyBuoyancy(buoyancy, tempAmbient, dt);
        
@@ -201,6 +205,17 @@ public class SmokeSim : MonoBehaviour
         advectShader.SetFloat("dissipation", dissipation);
         advectShader.Dispatch(kernelHandle, (int) size / 8, (int) size / 8, (int) size / 8);
         Switch(smokeDensity);
+    }
+
+    public void JacobiDiffusion(float dissipation, int numIterations) {
+        int kernelHandle = advectShader.FindKernel("JacobiDiffusion");
+        advectShader.SetFloat("dissipation", dissipation);
+        for(int i = 0; i < numIterations; i += 1) {
+            advectShader.SetTexture(kernelHandle, "Prev", smokeDensity[READ]);
+            advectShader.SetTexture(kernelHandle, "Result", smokeDensity[WRITE]);
+            advectShader.Dispatch(kernelHandle, (int) size / 8, (int) size / 8, (int) size / 8);
+            Switch(smokeDensity);
+        }
     }
 
     void Switch(RenderTexture[] textures) {
