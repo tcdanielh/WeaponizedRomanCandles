@@ -239,7 +239,8 @@ Shader "Unlit/NewUnlitShader"
             }
 
             float3 lightMarch(float3 ro) {
-                return ejectaMarch(ro) + sunMarch(ro);
+                return ejectaMarch(ro);
+                //return ejectaMarch(ro) + sunMarch(ro);
             }
 
             float3 bounceRD(int2 uv, float t, float expDensity, float3 forward) {

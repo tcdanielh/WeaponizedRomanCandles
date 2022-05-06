@@ -54,4 +54,4 @@ MonoBehaviour:
   color: {r: 0, g: 0, b: 0, a: 0}
   debug: 0
   smokeRadius: 3
-  smokePower: 1
+  smokePower: 5.13
