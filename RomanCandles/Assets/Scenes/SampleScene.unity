@@ -811,8 +811,8 @@ Light:
   serializedVersion: 10
   m_Type: 1
   m_Shape: 0
-  m_Color: {r: 1, g: 0.95686275, b: 0.8392157, a: 1}
-  m_Intensity: 0.01
+  m_Color: {r: 1, g: 0.9936724, b: 0.9764151, a: 1}
+  m_Intensity: 0.1
   m_Range: 10
   m_SpotAngle: 30
   m_InnerSpotAngle: 21.80208
@@ -1145,7 +1145,7 @@ MonoBehaviour:
   - {fileID: 694192455}
   - {fileID: 1817819956}
   - {fileID: 1188041263}
-  ejectaLightIntensity: 0.69
+  ejectaLightIntensity: 9.67
   ejectaColor: {r: 1, g: 0.2028302, b: 0.2028302, a: 0}
   sun: {fileID: 705507995}
 --- !u!114 &963194231

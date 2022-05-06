@@ -211,14 +211,15 @@ Shader "Unlit/NewUnlitShader"
                 float distToLight = length(lPos - ro);
                 float2 smokeBoxI = rayBoxIntersect(BoundsMin, BoundsMax, ro, rd);
                 float maxD = min(smokeBoxI.y, distToLight);
-                float stepSize = smokeBoxI.y / numStepsLight;
-
+                float stepSize = maxD / numStepsLight;
+                //float stepSize = .2;
                 float t = 0;
                 float totalDensity = 0;
                 while (t < maxD) {
                     float3 p = ro + (rd * t);
                     totalDensity += sampleDensity(p);
                     t += stepSize;
+                    //t += .1;
                 }
                 float transmit = exp(-stepSize * totalDensity);
                 return (light.color * transmit * lIntensity / (distToLight * distToLight));
@@ -239,8 +240,10 @@ Shader "Unlit/NewUnlitShader"
             }
 
             float3 lightMarch(float3 ro) {
-                return ejectaMarch(ro);
-                //return ejectaMarch(ro) + sunMarch(ro);
+                //float3 lPos = ClosestLight(ro).pos;
+                //return float3(1,1,1) * (4 - length(lPos - ro));
+                //return ejectaMarch(ro);
+                return ejectaMarch(ro) + sunMarch(ro);
             }
 
             float3 bounceRD(int2 uv, float t, float expDensity, float3 forward) {
@@ -265,7 +268,7 @@ Shader "Unlit/NewUnlitShader"
                     float expDen = exp(-stepSize * pointDensity * smokeLightAbsorb);
                     transmit *= expDen;
                     smokeDiffuse += pointDensity * pointLight * transmit * stepSize;
-                    smokeDiffuse += zeroLight(p, rd, stepSize) * transmit;
+                    //smokeDiffuse += zeroLight(p, rd, stepSize) * transmit;
                     
                     if (transmit < 0.01) break;
                     t += stepSize;
