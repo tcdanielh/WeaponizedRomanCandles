@@ -33,6 +33,8 @@ public class SmokeSim : MonoBehaviour
     [SerializeField] Vector3 gridMin;
     [SerializeField] float cellSize;
 
+    bool wind;
+
     public void SmokeStart()
     {
         gridMin = GetComponent<ScreenWriter>().gridMinPoint;
@@ -87,7 +89,7 @@ public class SmokeSim : MonoBehaviour
         impulsePower = 20.0f;//40.0f;
         buoyancy = 100000.0f;
         tempAmbient = 1000.0f;
-        dissipation = 100.2f;
+        dissipation = 50.2f;
         k = 0.0f;
         jacobiIterations = 20;
 
@@ -132,10 +134,12 @@ public class SmokeSim : MonoBehaviour
 
     private void Update()
     {
+        if (Input.GetKeyDown(KeyCode.W)) wind = !wind;
         float dt = 0.0f;
         JacobiDiffusion(dissipation, jacobiIterations);
         //AddDensity(impulsePosition, textureSize, impulseRadius, impulsePower);
-        AdvectDensity(textureSize, dissipation, dt); 
+        if (wind)
+            AdvectDensity(textureSize, dissipation, dt); 
        //Time.deltaTime;
         //ApplyBuoyancy(buoyancy, tempAmbient, dt);
        
