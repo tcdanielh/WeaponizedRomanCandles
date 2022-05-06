@@ -292,7 +292,8 @@ Shader "Unlit/NewUnlitShader"
                 bool hit = ((rayBIntersect.y > 0.0) && (rayBIntersect.x < depth));
                 //bool hit = (depth > 20);
                 if (hit) {
-                    col = rayMarch(i.uv,ro + (rd * rayBIntersect.x), rd, min(depth - rayBIntersect.x, rayBIntersect.y), rayBIntersect.y / numSteps, col);
+                    float mD = min(depth - rayBIntersect.x, rayBIntersect.y);
+                    col = rayMarch(i.uv,ro + (rd * rayBIntersect.x), rd, mD, mD / numSteps, col);
                 }
                 return col;
             }
