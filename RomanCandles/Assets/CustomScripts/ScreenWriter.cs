@@ -4,6 +4,15 @@ using UnityEngine;
 
 public class ScreenWriter : MonoBehaviour
 {
+    [SerializeField] float eyeOffset;
+    Matrix4x4 left_world_from_view;
+    Matrix4x4 right_world_from_view;
+
+    // Both stereo eye inverse projection matrices, plumbed through GetGPUProjectionMatrix to compensate for render texture
+    Matrix4x4 left_screen_from_view;
+    Matrix4x4 right_screen_from_view;
+    Matrix4x4 left_view_from_screen;
+    Matrix4x4 right_view_from_screen;
     [SerializeField] EjectaHandler ejectaHandler;
 
     public Color smokeColor;
@@ -133,6 +142,23 @@ public class ScreenWriter : MonoBehaviour
         ejectaBuffer.Release();
     }
 
+    private void OnPreRender()
+    {
+        // Both stereo eye inverse view matrices
+        left_world_from_view = cam.GetStereoViewMatrix(Camera.StereoscopicEye.Left).inverse;
+        right_world_from_view = cam.GetStereoViewMatrix(Camera.StereoscopicEye.Right).inverse;
+
+        // Both stereo eye inverse projection matrices, plumbed through GetGPUProjectionMatrix to compensate for render texture
+        left_screen_from_view = cam.GetStereoProjectionMatrix(Camera.StereoscopicEye.Left);
+        right_screen_from_view = cam.GetStereoProjectionMatrix(Camera.StereoscopicEye.Right);
+        left_view_from_screen = GL.GetGPUProjectionMatrix(left_screen_from_view, true).inverse;
+        right_view_from_screen = GL.GetGPUProjectionMatrix(right_screen_from_view, true).inverse;
+
+        // Negate [1,1] to reflect Unity's CBuffer state
+        left_view_from_screen[1, 1] *= -1;
+        right_view_from_screen[1, 1] *= -1;
+    }
+
     private void OnRenderImage(RenderTexture source, RenderTexture destination)
     {
        // es = GetComponent<FireworkSim>().es;
@@ -152,6 +178,10 @@ public class ScreenWriter : MonoBehaviour
             material = new Material(shader);
         }
 
+        material.SetMatrix("_LeftWorldFromView", left_world_from_view);
+        material.SetMatrix("_RightWorldFromView", right_world_from_view);
+        material.SetMatrix("_LeftViewFromScreen", left_view_from_screen);
+        material.SetMatrix("_RightViewFromScreen", right_view_from_screen);
 
         material.SetTexture("EHash", hash);
         material.SetTexture("EHashC", hashC);
@@ -166,8 +196,8 @@ public class ScreenWriter : MonoBehaviour
         material.SetVector("BoundsMax", container.position + container.localScale / 2);
         //material.SetTexture("Shape", smoke.getPerlinTexture());
         material.SetTexture("Shape", smokeSim.smokeDensity[0]);
-        material.SetInt("numSteps", 15);
-        material.SetInt("numStepsLight", 10);
+        material.SetInt("numSteps", 5);
+        material.SetInt("numStepsLight", 3);
         material.SetVector("lPos", lightPoint.position);
         material.SetVector("lColor", ejectaColor);
         material.SetFloat("lIntensity", ejectaLightIntensity);
