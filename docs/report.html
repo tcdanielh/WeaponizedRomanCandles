@@ -33,14 +33,695 @@
     <br />
     <div class="report-body">
         <h1 align="middle">Weaponized Roman Candles - Firework Simulation</h1>
-        <h2 align="middle">Daniel He, Nicholas Jennings, Anthony Villegas, Albert Wen</h2>
-        <div class="padded">
-            <p>
-                Not ready yet!
-            </p>
+        <h3 align="middle">Daniel He, Nicholas Jennings, Anthony Villegas, Albert Wen</h3>
+        <h2>Abstract</h2>
+        <p>
+            This is Weaponized Roman Candles, a real-time firework simulation that can run in Virtual Reality. To
+            create a firework, we start with a physical point simulation of the firework particles in a C# script,
+            which simulates the particles in the three stages on ascent, explosion, and decent. Each update, the
+            firework particle positions are sent to our smoke simulation C# script, which feeds the positions as
+            input to a compute shader, which is a program that runs on the GPU, but isn't directly used for
+            rendering. This compute shader adds a gaussian density to a 3D texture representing the smoke density of
+            the scene. Another series of compute shaders handles the physical simulation of the smoke.
+        </p>
+        <p>
+            The particle positions are also fed into a lookup compute shader that outputs a 3D lookup table which
+            allows us to render hundreds of point lights in realtime. Every time Unity renders the scene, the smoke
+            density and particle lookup textures are sent to a fragment shader which renders the smoke and point
+            lights.
+        </p>
+
+        <h2>Technical Approach</h2>
+        <h3>Firework Simulation</h3>
+        <p>
+            The model for the firework was inspired by the kinematics of Professor Tarek Zohdi’s research paper <a
+                href="http://cmmrl.berkeley.edu/zohdipaper/127.pdf">On
+                firework blasts and qualitative parameter dependency</a>. Ejecta, or particles, result from the
+            fragmenting
+            blast created by the firework rocket. We made several simplifications to model a firework:
+        <ol>
+            <li>
+                <p>The rocket and ejecta can be simplified to spheres.</p>
+            </li>
+            <li>
+                <p>Ejecta do not interact with each other.</p>
+            </li>
+            <li>
+                <p>Ejecta are identical in size and mass.</p>
+            </li>
+            <li>
+                <p>Ejecta receive the same change in speed upon detonation.</p>
+            </li>
+            <li>
+                <p>Ejecta can be idealized as point masses and analyzed with exclusively translational motion.</p>
+            </li>
+        </ol>
+        </p>
+        <h4>Ascent</h4>
+        <p>
+            During the ascent phase, all ejecta travel together in a rocket until a predetermined time to explode <math
+                xmlns="http://www.w3.org/1998/Math/MathML">
+                <mstyle displaystyle="true">
+                    <mrow class="MJX-TeXAtom-ORD">
+                        <msub>
+                            <mrow class="MJX-TeXAtom-ORD">
+                                <mo>&#x1D461;</mo>
+                            </mrow>
+                            <mrow class="MJX-TeXAtom-ORD">
+                                <mo>&#x1D452;</mo>
+                            </mrow>
+                        </msub>
+                    </mrow>
+                </mstyle>
+            </math>.
+            We follow the phenomenological model for drag force and hybrid drag referenced in the paper. We assume that
+            there is some initial launch velocity <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <mstyle displaystyle="true">
+                    <mrow class="MJX-TeXAtom-ORD">
+                        <msub>
+                            <mi>v</mi>
+                            <mn>0</mn>
+                        </msub>
+                    </mrow>
+                </mstyle>
+            </math> and follow the kinematics of projectile motion.
+        </p>
+        <p>
+            The governing equation for all ejecta is based on Newton’s second law of motion:
+        </p>
+        <p style="text-align:center">
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <mstyle displaystyle="true">
+                    <mrow class="MJX-TeXAtom-ORD">
+                        <msubsup>
+                            <mi mathvariant="normal">&#x03A8;
+                                <!-- Ψ -->
+                            </mi>
+                            <mrow class="MJX-TeXAtom-ORD">
+                                <mi>i</mi>
+                            </mrow>
+                            <mrow class="MJX-TeXAtom-ORD">
+                                <mi>t</mi>
+                                <mi>o</mi>
+                                <mi>t</mi>
+                            </mrow>
+                        </msubsup>
+                        <mo>=</mo>
+                        <msub>
+                            <mi>F</mi>
+                            <mrow class="MJX-TeXAtom-ORD">
+                                <mi>d</mi>
+                                <mo>,</mo>
+                                <mi>i</mi>
+                            </mrow>
+                        </msub>
+                        <mo>+</mo>
+                        <msub>
+                            <mi>F</mi>
+                            <mrow class="MJX-TeXAtom-ORD">
+                                <mi>g</mi>
+                                <mo>,</mo>
+                                <mi>i</mi>
+                            </mrow>
+                        </msub>
+                    </mrow>
+                </mstyle>
+            </math>
+        </p>
+        <p>
+            Where
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <mstyle displaystyle="true">
+                    <mrow class="MJX-TeXAtom-ORD">
+                        <msub>
+                            <mi>F</mi>
+                            <mrow class="MJX-TeXAtom-ORD">
+                                <mi>g</mi>
+                                <mo>,</mo>
+                                <mi>i</mi>
+                            </mrow>
+                        </msub>
+                    </mrow>
+                </mstyle>
+            </math>
+            is the force of gravity and
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <mstyle displaystyle="true">
+                    <mrow class="MJX-TeXAtom-ORD">
+                        <msub>
+                            <mi>F</mi>
+                            <mrow class="MJX-TeXAtom-ORD">
+                                <mi>d</mi>
+                                <mo>,</mo>
+                                <mi>i</mi>
+                            </mrow>
+                        </msub>
+                    </mrow>
+                </mstyle>
+            </math>
+            is the force of drag. We also used explicit Euler integration to numerically solve for ejecta positions and
+            velocities at each time step of the simulation:
+        </p>
+        <p style="text-align:center">
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <mstyle displaystyle="true">
+                    <mrow class="MJX-TeXAtom-ORD">
+                        <msub>
+                            <mrow class="MJX-TeXAtom-ORD">
+                                <mo>&#x1D493;</mo>
+                            </mrow>
+                            <mi>i</mi>
+                        </msub>
+                        <mo stretchy="false">(</mo>
+                        <mi>t</mi>
+                        <mo>+</mo>
+                        <mi mathvariant="normal">&#x0394;
+                            <!-- Δ -->
+                        </mi>
+                        <mi>t</mi>
+                        <mo stretchy="false">)</mo>
+                        <mo>=</mo>
+                        <msub>
+                            <mrow class="MJX-TeXAtom-ORD">
+                                <mo>&#x1D493;</mo>
+                            </mrow>
+                            <mi>i</mi>
+                        </msub>
+                        <mo stretchy="false">(</mo>
+                        <mi>t</mi>
+                        <mo stretchy="false">)</mo>
+                        <mo>+</mo>
+                        <msub>
+                            <mrow class="MJX-TeXAtom-ORD">
+                                <mo>&#x1D497;</mo>
+                            </mrow>
+                            <mi>i</mi>
+                        </msub>
+                        <mo stretchy="false">(</mo>
+                        <mi>t</mi>
+                        <mo stretchy="false">)</mo>
+                        <mi mathvariant="normal">&#x0394;
+                            <!-- Δ -->
+                        </mi>
+                        <mi>t</mi>
+                    </mrow>
+                </mstyle>
+            </math>
+        </p>
+        <p style="text-align:center">
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <mstyle displaystyle="true">
+                    <mrow class="MJX-TeXAtom-ORD">
+                        <msub>
+                            <mrow class="MJX-TeXAtom-ORD">
+                                <mo>&#x1D497;</mo>
+                            </mrow>
+                            <mi>i</mi>
+                        </msub>
+                        <mo stretchy="false">(</mo>
+                        <mi>t</mi>
+                        <mo>+</mo>
+                        <mi mathvariant="normal">&#x0394;
+                            <!-- Δ -->
+                        </mi>
+                        <mi>t</mi>
+                        <mo stretchy="false">)</mo>
+                        <mo>=</mo>
+                        <msub>
+                            <mrow class="MJX-TeXAtom-ORD">
+                                <mo>&#x1D497;</mo>
+                            </mrow>
+                            <mi>i</mi>
+                        </msub>
+                        <mo stretchy="false">(</mo>
+                        <mi>t</mi>
+                        <mo stretchy="false">)</mo>
+                        <mo>+</mo>
+                        <mo stretchy="false">(</mo>
+                        <msup>
+                            <mrow class="MJX-TeXAtom-ORD">
+                                <mo>&#x1D6D9;</mo>
+                            </mrow>
+                            <mrow class="MJX-TeXAtom-ORD">
+                                <mi>t</mi>
+                                <mi>o</mi>
+                                <mi>t</mi>
+                            </mrow>
+                        </msup>
+                        <mrow class="MJX-TeXAtom-ORD">
+                            <mo>/</mo>
+                        </mrow>
+                        <msub>
+                            <mi>m</mi>
+                            <mi>i</mi>
+                        </msub>
+                        <mo stretchy="false">)</mo>
+                        <mi mathvariant="normal">&#x0394;
+                            <!-- Δ -->
+                        </mi>
+                        <mi>t</mi>
+                    </mrow>
+                </mstyle>
+            </math>
+        </p>
+        <p>
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <mstyle displaystyle="true">
+                    <mrow class="MJX-TeXAtom-ORD">
+                        <msub>
+                            <mi>r</mi>
+                            <mi>i</mi>
+                        </msub>
+                    </mrow>
+                </mstyle>
+            </math> represents the position of an ejectum in fixed Cartesian space,
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <mstyle displaystyle="true">
+                    <mrow class="MJX-TeXAtom-ORD">
+                        <msub>
+                            <mi>v</mi>
+                            <mi>i</mi>
+                        </msub>
+                    </mrow>
+                </mstyle>
+            </math> is its position, and
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <mstyle displaystyle="true">
+                    <mrow class="MJX-TeXAtom-ORD">
+                        <msub>
+                            <mi>m</mi>
+                            <mi>i</mi>
+                        </msub>
+                    </mrow>
+                </mstyle>
+            </math> is its mass. Explicit Euler integration was chosen because the referenced paper also used it
+            throughout.
+        </p>
+
+        <h4>Explosion</h4>
+        <p>At <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <mstyle displaystyle="true">
+                    <mrow class="MJX-TeXAtom-ORD">
+                        <msub>
+                            <mrow class="MJX-TeXAtom-ORD">
+                                <mo>&#x1D461;</mo>
+                            </mrow>
+                            <mrow class="MJX-TeXAtom-ORD">
+                                <mo>&#x1D452;</mo>
+                            </mrow>
+                        </msub>
+                    </mrow>
+                </mstyle>
+            </math>, all ejecta receive a randomized trajectory that is uniform on the firework’s surface and experience
+            the same change in speed. </p>
+
+        <h4>Descent</h4>
+        <p>Ejecta enter free-fall and settle to the ground. </p>
+
+        <h3>Smoke Simulation</h3>
+        <p>
+            The smoke dynamics were implemented by following the ideas described in the <a
+                href="https://web.archive.org/web/20211210091803/https://developer.download.nvidia.com/books/HTML/gpugems/gpugems_ch38.html">GPU
+                Gems article by Mark Harris</a>
+            and <a href="http://graphics.cs.cmu.edu/nsp/course/15-464/Fall09/papers/StamFluidforGames.pdf">a paper by
+                Jos Stam</a>. Both authors described 2D simulations which required us to adapt the methods and
+            data structures employed for 3D.
+        </p>
+        <p>
+            The smoke is modeled as a grid stored in a 3D texture where each cube has a corresponding density
+            representing how light or dark the smoke in that cell should be, as opposed to individual particles, which
+            allows us to efficiently simulate the dynamics of smoke in real time.This smoke density texture is populated
+            by adding density along the trajectories of the ejected particles of the firework, emulating a smoke trail.
+            A separate 3D texture representing a velocity field is populated based on forces present such as wind or
+            buoyancy. We advect (move) the densities over time by setting the current density equal to the density we
+            hit by tracing the corresponding negated velocity backwards as outlined by Stam in order to avoid the
+            complexity in advecting partial densities into multiple grids. A side note is that due to these computations
+            being done in compute shaders to leverage computation in parallel, two copies of each texture are created
+            (i.e. two density textures) as we cannot simultaneously read and write to the textures.
+        </p>
+
+        <p>
+            Before advecting we diffuse densities by solving the following equation using ~20 Jacobi iterations, where
+            diffusion is a scalar determining how quickly the smoke fades away or into neighbors. The effect of this is
+            that the current cell’s density gradually becomes the average of its neighbors over time in a numerically
+            stable way.
+        </p>
+
+        <p style="text-align:center">
+            <math xmlns="http://www.w3.org/1998/Math/MathML">
+                <mstyle displaystyle="true">
+                    <mrow class="MJX-TeXAtom-ORD">
+                        <mi>D</mi>
+                        <mi>e</mi>
+                        <mi>n</mi>
+                        <mi>s</mi>
+                        <mi>i</mi>
+                        <mi>t</mi>
+                        <mi>y</mi>
+                        <mo stretchy="false">[</mo>
+                        <mi>n</mi>
+                        <mi>e</mi>
+                        <mi>x</mi>
+                        <mi>t</mi>
+                        <mo stretchy="false">]</mo>
+                        <mo>=</mo>
+                        <mo stretchy="false">(</mo>
+                        <mi>D</mi>
+                        <mi>e</mi>
+                        <mi>n</mi>
+                        <mi>s</mi>
+                        <mi>i</mi>
+                        <mi>t</mi>
+                        <mi>y</mi>
+                        <mo stretchy="false">[</mo>
+                        <mi>c</mi>
+                        <mi>u</mi>
+                        <mi>r</mi>
+                        <mi>r</mi>
+                        <mo stretchy="false">]</mo>
+                        <mo>+</mo>
+                        <mi>d</mi>
+                        <mi>i</mi>
+                        <mi>f</mi>
+                        <mi>f</mi>
+                        <mi>u</mi>
+                        <mi>s</mi>
+                        <mi>i</mi>
+                        <mi>o</mi>
+                        <mi>n</mi>
+                        <mo>&#x00D7;
+                            <!-- × -->
+                        </mo>
+                        <munderover>
+                            <mo movablelimits="false">&#x2211;
+                                <!-- ∑ -->
+                            </mo>
+                            <mrow class="MJX-TeXAtom-ORD">
+                                <mo>&lt;</mo>
+                                <mi>n</mi>
+                                <mi>e</mi>
+                                <mi>i</mi>
+                                <mi>g</mi>
+                                <mi>h</mi>
+                                <mi>b</mi>
+                                <mi>o</mi>
+                                <mi>r</mi>
+                                <mi>s</mi>
+                                <mo>&gt;</mo>
+                            </mrow>
+                            <mrow class="MJX-TeXAtom-ORD">
+                                <mi>i</mi>
+                            </mrow>
+                        </munderover>
+                        <mrow class="MJX-TeXAtom-ORD">
+                            <mi>D</mi>
+                            <mi>e</mi>
+                            <mi>n</mi>
+                            <mi>s</mi>
+                            <mi>i</mi>
+                            <mi>t</mi>
+                            <mi>y</mi>
+                            <mo stretchy="false">[</mo>
+                            <mi>i</mi>
+                            <mo stretchy="false">]</mo>
+                            <mrow class="MJX-TeXAtom-ORD">
+                                <mo>/</mo>
+                            </mrow>
+                            <mn>6.0</mn>
+                        </mrow>
+                        <mo stretchy="false">)</mo>
+                        <mrow class="MJX-TeXAtom-ORD">
+                            <mo>/</mo>
+                        </mrow>
+                        <mo stretchy="false">(</mo>
+                        <mn>1</mn>
+                        <mo>+</mo>
+                        <mi>d</mi>
+                        <mi>i</mi>
+                        <mi>f</mi>
+                        <mi>f</mi>
+                        <mi>u</mi>
+                        <mi>s</mi>
+                        <mi>i</mi>
+                        <mi>o</mi>
+                        <mi>n</mi>
+                        <mo stretchy="false">)</mo>
+                    </mrow>
+                </mstyle>
+            </math>
+        </p>
+        <p>
+            While not all the additional features for smoke simulation outlined in Harris’ article are implemented (i.e.
+            vorticity confinement), the fact that firework smoke is usually observed from a distance means that these
+            effects aren’t as noticeable even in real world smoke and the model as it exists in our code remains
+            convincing.
+        </p>
+
+        <h3>Rendering</h3>
+        <p>
+            Unity has a built-in function called OnRenderImage, which is called every time the game engine renders the
+            image. OnRenderImage contains the image of a game scene as rendered by the standard Unity pipeline, so by
+            creating a new material with a custom fragment shader and applying it to the image, we can modify the scene
+            to display the firework.
+        </p>
+
+        <h4>Ray Marching</h4>
+        <p>
+            The core of the fragment shader was taken from a cloud shader made by Sebastian Lague. The Fragment shader
+            itself acts somewhat similar to the ray tracing we did in project 3. A ray origin and direction are
+            calculated from the image UV coordinates, the ray is “marched” along by a fixed distance, sampling the smoke
+            density at each point until the ray exits the bounding box of the smoke, or the distance exceeds the depth
+            buffer of the original render (which is also provided by Unity). The “transmittance” at this point, which is
+            the amount of light considered to pass through this point from behind the point, is calculated as <math
+                xmlns="http://www.w3.org/1998/Math/MathML">
+                <mstyle displaystyle="true">
+                    <mrow class="MJX-TeXAtom-ORD">
+                        <msup>
+                            <mi>e</mi>
+                            <mrow class="MJX-TeXAtom-ORD">
+                                <mo>&#x2212;
+                                    <!-- − -->
+                                </mo>
+                                <mi>S</mi>
+                                <mi>t</mi>
+                                <mi>e</mi>
+                                <mi>p</mi>
+                                <mi>S</mi>
+                                <mi>i</mi>
+                                <mi>z</mi>
+                                <mi>e</mi>
+                                <mo>&#x2217;
+                                    <!-- ∗ -->
+                                </mo>
+                                <mi>S</mi>
+                                <mi>a</mi>
+                                <mi>m</mi>
+                                <mi>p</mi>
+                                <mi>l</mi>
+                                <mi>e</mi>
+                                <mi>D</mi>
+                                <mi>e</mi>
+                                <mi>n</mi>
+                                <mi>s</mi>
+                                <mi>i</mi>
+                                <mi>t</mi>
+                                <mi>y</mi>
+                                <mo>&#x2217;
+                                    <!-- ∗ -->
+                                </mo>
+                                <mi>S</mi>
+                                <mi>m</mi>
+                                <mi>o</mi>
+                                <mi>k</mi>
+                                <mi>e</mi>
+                                <mi>L</mi>
+                                <mi>i</mi>
+                                <mi>g</mi>
+                                <mi>h</mi>
+                                <mi>t</mi>
+                                <mi>A</mi>
+                                <mi>b</mi>
+                                <mi>s</mi>
+                                <mi>o</mi>
+                                <mi>r</mi>
+                                <mi>b</mi>
+                            </mrow>
+                        </msup>
+                    </mrow>
+                </mstyle>
+            </math> where ‘SmokeLightAbsorb’ is a variable we can use to make the smoke look more or less dense. The
+            equation isn’t physically accurate, but binds the transmittance between 0 and 1, and looks alright in
+            practice. The full transmittance of the ray is the product of all the point transmittances, and is
+            multiplied by the original color of the fragment to get the final color. One major difference between this
+            shader and the system we made in Project 3 is that, since this shader runs on the gpu, it can’t create
+            random numbers. It’s possible to generate random numbers on the cpu and pass them to the gpu, but we found
+            that the reduction in resolution and point sample frequency required to do ray supersampling wouldn’t be
+            worth the reduction in noise from monte-carlo integration.
+
+        </p>
 
 
+        <h4>Sampling the Smoke Density</h4>
+        <p>
+            The cloud shader we based our smoke shader on used a repeating 3d texture to represent the cloud density.
+            Since we have a different texture system, we implemented the smoke density sampling ourselves. The smoke
+            texture position of the sample point is calculated by taking the difference of the sample point and the
+            minimum world-position of the density texture, then dividing by the length of a single smoke voxel. We then
+            lerp the 8 closest voxels to the point to get the sample density. Since we’re lerping the densities, it
+            turns out that we can get away with using very large smoke voxel sizes while maintaining realistic looking
+            smoke (as alluded to in GPU gems 3). The limiting factor turned out to be the initial smoke trail size,
+            since we can’t render a trail thinner than the width of a voxel.
+        </p>
+
+        <h4>Lighting / Sampling the Ejecta</h4>
+        <p>
+            To light the smoke, we cast a light ray similar to the initial ray, except towards a light source. One
+            problem we faces is that the hundreds of moving point lights from the ejecta would be to slow to calculate
+            naively. We got out of this pickle by making a few assumptions. First, the intensity of an individual ejecta
+            is relatively low, so scene points far from the ejecta don’t need to consider them as a light source.
+            Second, all the ejecta of a firework are the same color. For most points on the scene the closest ejecta is
+            probably the same color as the next few closest, so if each sample point only considers its closest ejecta
+            we won’t see too many artifacts of color lights suddenly being cut off. We decided to make an ejecta lookup
+            table in the form of another 3d texture, which we populated using another compute shader. Each ejecta
+            inforst the voxels close to it of its location (since we know the size of the lookup table we can map world
+            coordinates to colors) and if a voxel is close to more than one shader, ties are broken by calculating which
+            ejecta is closer to the center to the voxel. In this way each voxel that is close enough to an ejecta to be
+            lit by it has the coordinate of it’s closest ejecta. In the fragment shader, this lookup table is used to
+            find the closest ejecta to each sample point, and the point light is rendered from there.
+
+        </p>
+
+
+        <h4>VR</h4>
+        <p>
+            Rendering in VR works nearly identical to regular rendering. The default unity pipeline produces a
+            double-wide image representing the view from each eye, and we can use the inverse-projection and
+            camera-to-world matrices provided by unity to calculate the rays for each UV. Since this amounts to
+            rendering the scene twice, and VR requires a higher framerate than a typical screen, the only major
+            difference in our code was the large reduction in samples-per-fragment required to speed up our rendering.
+        </p>
+        <p>
+            Further VR interactivity was added to include basic controls of moving around the scene, and being able to
+            shoot fireworks using the trigger on the VR controller, from the direction the controller is pointing at -
+            rendering fireworks shot from this angle.
+        </p>
+
+        <p>
+            Here is a diagram of our general implementation pipeline:
+        </p>
+        <div align="center">
+            <img src="images/pipeline2.png" />
         </div>
+
+        <h2>Results</h2>
+        <p>
+            Here are examples of our fireworks in action with an external force of wind blowing to the right!
+        </p>
+        <p>
+            Just smoke:
+        </p>
+        <div align="center">
+            <img src="images/onlySmoke2.gif" />
+        </div>
+
+        <p>
+            Smoke and ejecta together during day and night:
+        </p>
+        <div align="center">
+            <img src="images/smoke_flow002.gif" />
+        </div>
+        <div align="center">
+            <img src="images/night_firework002.gif" />
+        </div>
+
+        <p>
+            Finalee! A bunch of launched fireworks in random directions to show we can render many at the same time
+            without taking a performance hit.
+        </p>
+        <div align="center">
+            <img src="images/finalee.gif" />
+        </div>
+
+        <p>
+            Shooting and rendering the fireworks in VR as well.
+        </p>
+        <div align="center">
+            <video width="1000" controls>
+                <source src="images/VR Final.mp4" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        </div>
+
+
+        <h3>Final Project Video</h3>
+        <div align="center">
+            <iframe width="1000" height="560" src="https://www.youtube.com/embed/IADcN83De2w"
+                title="YouTube video player" frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowfullscreen></iframe>
+        </div>
+
+
+
+        <h2>Disclaimer</h2>
+        <p>
+            We do not endorse the misuse of pyrotechnics in real life against other peoples or properties.
+        </p>
+
+        <p>
+            <b>You can try the project out by building the <a
+                    href="https://github.com/tcdanielh/WeaponizedRomanCandles">repository</a> in Unity
+                2020.3. To try the VR implementation, switch to the "VR" branch.</b>
+        </p>
+
+        <h2>References</h2>
+        <ul>
+            <li>
+                Tarek Zohdi On firework blasts and qualitative parameter dependency<br> <a
+                    href="http://cmmrl.berkeley.edu/zohdipaper/127.pdf">http://cmmrl.berkeley.edu/zohdipaper/127.pdf</a>
+            </li>
+            <li>
+                Sebastian Lague’s Cloud Shader<br> <a href="https://www.youtube.com/watch?v=4QOcCGI6xOU&t=249s
+                ">https://www.youtube.com/watch?v=4QOcCGI6xOU&t=249s
+                </a>
+            </li>
+            <li>
+                GPU Gems 3, Chapter 30: Real-Time Simulation and Rendering of 3D Fluids<br> <a
+                    href="https://developer.nvidia.com/gpugems/gpugems3/part-v-physics-simulation/chapter-30-real-time-simulation-and-rendering-3d-fluids
+                ">https://developer.nvidia.com/gpugems/gpugems3/part-v-physics-simulation/chapter-30-real-time-simulation-and-rendering-3d-fluids
+                </a>
+            </li>
+            <li>
+                Real Time Fluid Dynamics for Games, Jos Stam<br> <a href="http://graphics.cs.cmu.edu/nsp/course/15-464/Fall09/papers/StamFluidforGames.pdf
+                ">http://graphics.cs.cmu.edu/nsp/course/15-464/Fall09/papers/StamFluidforGames.pdf
+                </a>
+            </li>
+            <li>
+                How To Write a Smoke Shader <br> <a href="https://gamedevelopment.tutsplus.com/tutorials/how-to-write-a-smoke-shader--cms-25587
+                ">https://gamedevelopment.tutsplus.com/tutorials/how-to-write-a-smoke-shader--cms-25587
+                </a>
+            </li>
+            <li>
+                Unity Compute Shaders<br> <a href="https://youtu.be/qDk-WIOYUSY
+                ">https://youtu.be/qDk-WIOYUSY
+                </a>
+            </li>
+            <li>
+                GPU Gems, Chapter 38: Fast Fluid Dynamics Simulation on the GPU, Mark J. Harris<br> <a
+                    href="https://web.archive.org/web/20211210091803/https://developer.download.nvidia.com/books/HTML/gpugems/gpugems_ch38.html
+                ">https://web.archive.org/web/20211210091803/https://developer.download.nvidia.com/books/HTML/gpugems/gpugems_ch38.html
+                </a>
+            </li>
+        </ul>
+
+        <h2>Contributions from each Member</h2>
+        <p>
+            <b>Nicholas</b>: Fragment shader, VR shader setup, Ejecta lookup table, Integration.<br>
+            <b>Daniel</b>: Helped implement smoke simulation and compute shaders, VR shader and VR interaction, created
+            website.<br>
+            <b>Anthony</b>: Implemented smoke physics in C# script and compute shaders.<br>
+            <b>Albert</b>: Coded physics of fragmenting blast in C# script.
+        </p>
 </body>
 
 </html>
